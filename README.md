@@ -1,2 +1,2 @@
 # MyInspectionBuddy
-App assisting medical device inspections
+App assisting medical device inspections.
