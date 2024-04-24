@@ -13,7 +13,7 @@ def index():
 
 @app.route("/")
 
-def search510k()
+def search510k():
     # this script is for searching the 510k database by decision date
     # this script provides a clickable url link of the json data
     # this script provides a downloadable Excel file in the directory where the script is ran
