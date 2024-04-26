@@ -9,9 +9,18 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "search item - 510k"
+    # return "search item - 510k"
+    # optional - replace html date range form with html date picker form
+        date_range = request.args.get("date_range", "")
+    return (
+        """<form action="" method="get">
+                <input type="text" name="Date Range maxyyyymmddTOminyyyymmdd">
+                <input type="submit" value="Convert">
+            </form>"""
+        + date_range
+    )
 
-@app.route("/")
+@app.route("/<date_range>")
 
 def search510k():
     # this script is for searching the 510k database by decision date
@@ -22,12 +31,12 @@ def search510k():
     apikey = 'e3oka6wF312QcwuJguDeXVEN6XGyeJC94Hirijj8'
 
     # Ask user for minimum date
-    min_date = input("Enter the minimum date (YYYY-MM-DD): ")
+    # min_date = input("Enter the minimum date (YYYY-MM-DD): ")
     # Ask user for maximum date
-    max_date = input("Enter the maximum date (YYYY-MM-DD): ")
+    # max_date = input("Enter the maximum date (YYYY-MM-DD): ")
 
     # Format date range for URL
-    date_range = f"{min_date}+TO+{max_date}"
+    # date_range = f"{min_date}+TO+{max_date}"
 
     # Build the URL with user input
     url = f'https://api.fda.gov/device/510k.json?api_key={apikey}&search=decision_date:{date_range}&limit=100'
