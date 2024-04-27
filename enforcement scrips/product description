@@ -19,10 +19,9 @@ def index():
         date_range = request.args.get("date_range", "")
     return (
         """<form action="" method="get">
-                <input type="text" name="Date Range maxyyyymmddTOminyyyymmdd">
+                <input type="text" name="product description">
                 <input type="submit" value="Convert">
             </form>"""
-        + date_range
     )
 
 @app.route("/<date_range>")
