@@ -1,0 +1,1 @@
+this folder is for work on projections for 360 images
