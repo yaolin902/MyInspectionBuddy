@@ -9,16 +9,10 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    # return "search item - 510k"
+    return "search item - 510k"
     # optional - replace html date range form with html date picker form
         date_range = request.args.get("date_range", "")
-    return (
-        """<form action="" method="get">
-                <input type="text" name="Date Range maxyyyymmddTOminyyyymmdd">
-                <input type="submit" value="Convert">
-            </form>"""
-        + date_range
-    )
+    #  form from  https://realpython.com/python-web-applications/#brush-up-on-the-basics
 
 @app.route("/<date_range>")
 
