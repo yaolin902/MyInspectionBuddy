@@ -1,96 +1,148 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
-  const [serverMessage, setServerMessage] = useState('Loading data from server...');
-
-  useEffect(() => {
-    fetch('http://10.0.0.63:8080/message')
-      .then(response => response.json())
-      .then(data => {
-        setServerMessage(data.message);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        setServerMessage('Failed to load data');
-      });
-  }, []);
-
-  
-
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Device Inspection</Text>
-      <TouchableOpacity style={styles.button}>
+      <View style={styles.appNameContainer}>
+        <Text style={styles.appName}>MY INSPECTION BUDDY</Text>
+      </View>
+      <TouchableOpacity style={styles.topButton}>
         <Image source={require('../../assets/search-icon.png')} style={styles.icon} />
-        <Text>Recall Search</Text>
+        <Text style={styles.buttonText}>Recall Search</Text>
       </TouchableOpacity>
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('FDA')} >
-          <Text>FDA Enforcement</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('K510')}>
-          <Text>510k</Text>
-        </TouchableOpacity>
+      <View style={styles.middleContainer}>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={[styles.button, styles.button1]} onPress={() => navigation.navigate('FDA')}>
+            <Text style={styles.buttonText}>FDA Enforcement</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.button2]} onPress={() => navigation.navigate('K510')}>
+            <Text style={styles.buttonText}>510k</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={[styles.button, styles.button3]} onPress={() => navigation.navigate('Maude')}>
+            <Text style={styles.buttonText}>MAUDE</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.button4]} onPress={() => navigation.navigate('CDPH')}>
+            <Text style={styles.buttonText}>CDPH Medical Device Page</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={[styles.button, styles.button5]} onPress={() => navigation.navigate('OpenHistoricalScreen')}>
+            <Text style={styles.buttonText}>Historical Documents</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.button6]} onPress={() => navigation.navigate('WarningLetter')}>
+            <Text style={styles.buttonText}>FDA Warning Letter Database</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={[styles.button, styles.button7]} onPress={() => navigation.navigate('CAEntitySearchScreen')}>
+            <Text style={styles.buttonText}>CA Business Entity Search</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Maude')}>
-          <Text>MAUDE</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Abby')}>
-          <Text>Abby's Page</Text>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.bottomButton}>
         <Image source={require('../../assets/camera-icon.png')} style={styles.icon} />
-        <Text>Device Recognition</Text>
+        <Text style={styles.buttonText}>Device Detection</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.footerButton}>
-        <Text>Camera</Text>
-      </TouchableOpacity>
-    
-      {/* ... Rest of your buttons and views */}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      paddingTop: 200,
-      width: width, // Use the full width of the screen
-      height: height, // Use the full height of the screen
-    },
-    header: {
-      fontSize: width * 0.05, // Example of responsive font size
-      fontWeight: 'bold',
-      marginBottom: 150,
-    },
-    button: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: 10,
-      paddingHorizontal: width * 0.05, // Padding proportional to screen width
-      margin: 5,
-      borderWidth: 2,
-      borderRadius: 5,
-      minWidth: width * 0.4, // Minimum width of button
-    },
-    buttonRow: {
-      flexDirection: 'row',
-      marginVertical: 20,
-    },
-    icon: {
-      width: width * 0.10, // Set the width relative to screen width
-      height: width * 0.10, // Set the height relative to screen width
-      margin: 20,
-    },
-    // Add more styles as needed
-  });
-// ... Styles remain the same
-export default HomeScreen;
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 20,
+    paddingBottom: 50,
+    backgroundColor: '#FFFFFF',
+  },
+  appNameContainer: {
+    paddingVertical: 20,
+  },
+  appName: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#FF0000', // Red color for the app name
+  },
+  topButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: width * 0.9,
+    padding: 15,
+    backgroundColor: '#E1F5EA',
+    borderRadius: 10,
+    borderColor: '#4CAF50',
+    borderWidth: 1,
+    marginBottom: 20,
+  },
+  bottomButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: width * 0.9,
+    padding: 15,
+    backgroundColor: '#E1F5EA',
+    borderRadius: 10,
+    borderColor: '#4CAF50',
+    borderWidth: 1,
+  },
+  middleContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 10,
+  },
+  button: {
+    width: width * 0.25,
+    height: width * 0.2, // Make buttons more square-shaped
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20, // Rounded edges
+    marginHorizontal: 10,
+    padding: 10, // Adjust padding for content inside the button
+  },
+  button1: {
+    backgroundColor: '#FFCDD2',
+  },
+  button2: {
+    backgroundColor: '#C8E6C9',
+  },
+  button3: {
+    backgroundColor: '#BBDEFB',
+  },
+  button4: {
+    backgroundColor: '#D1C4E9',
+  },
+  button5: {
+    backgroundColor: '#FFE0B2',
+  },
+  button6: {
+    backgroundColor: '#B2DFDB',
+  },
+  button7: {
+    backgroundColor: '#FFEB3B',
+  },
+  buttonText: {
+    fontSize: 25,
+    color: '#000000',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  icon: {
+    width: width * 0.1,
+    height: width * 0.1,
+    marginRight: 10,
+  },
+});
 
+export default HomeScreen;
