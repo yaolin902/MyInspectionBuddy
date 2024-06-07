@@ -1,8 +1,15 @@
 # This Python script uses SQLite to create a Data Base File
-# The database table is populated with contact info collected from an Excel CSV file
+# The database table is populated with contact info collected from an Excel file
 
 import sqlite3
-import csv
+import pandas as pd
+
+# Read .xlsx file containing column names
+info = pd.read_excel('CA District Attorney.xlsx', header=0)
+
+# Remove leading and trailing whitespace using strip()
+# Apply strip() to each element of `info` for strings only
+info = info.applymap(lambda x: x.strip() if isinstance(x, str) else x)
 
 # Create new database and open database connection
 con = sqlite3.connect("contact_info.db")
@@ -14,23 +21,11 @@ cur = con.cursor()
 cur.execute("DROP TABLE IF EXISTS contact")
 
 # Create contact table in database 
-# TBD: Column Names?
 cur.execute("CREATE TABLE contact(County TEXT, Name TEXT, Address TEXT, Phone TEXT, Fax TEXT, Link_to_Website TEXT)")
 
 
 # List of data to store in the contact table of the database
-contact_list = []
-
-# TBD: Can also webscrape?
-# Open csv in read mode
-with open('info.csv', mode='r', newline='') as file1:
-    csv_reader = csv.reader(file1) # Object to read the file
-    next(csv_reader) # Skip header
-
-    # Iterate through each row in info.csv
-    for row in csv_reader:
-        # Append to add elements of row to contact_list
-        contact_list.append(((row[0]), row[1], row[2], row[3], row[4], row[5]))
+contact_list = [tuple(row) for row in info.values]
 
 
 # Insert multiple rows into contact_list
