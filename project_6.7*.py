@@ -38,8 +38,8 @@ request = {
 
 # send post request
 response = rq.post(api_url, json=request,
-                   headers={'Content-Type': 'application/json', 'Authorization-User': 'Argus.Sun@cdph.ca.gov',
-                            'Authorization-Key': 'I0YYJ95S1JVKJK2'})
+                   headers={'Content-Type': 'application/json', 'Authorization-User': 'INSERT EMAIL ADDRESS',
+                            'Authorization-Key': 'INSERT KEY'})
 
 # parse response
 out = response.json()
