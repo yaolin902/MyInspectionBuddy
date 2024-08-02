@@ -6,11 +6,24 @@ import os
 from bs4 import BeautifulSoup
 import re
 from urllib.parse import urljoin
+import time, uuid
+import serpapi
+from flask import send_from_directory, flash, redirect
+
+# define constants
+UPLOAD_FOLDER = "/uploads"
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
+MAX_FILE_TIME = 3 * 86400
+PUBLIC_IP = "98.208.96.137"
 
 # Initialize the Flask application
 app = Flask(__name__)
 # Enable Cross-Origin Resource Sharing (CORS) for the app
 CORS(app)
+
+# set up upload config
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO)
@@ -95,7 +108,6 @@ def search_k510():
         query_params.append(f'applicant:"{applicant_name}"')
     if device_name:
         query_params.append(f'device_name:"{device_name}"')
-    
 
     # Construct the final query string
     query = ' AND '.join(query_params)
@@ -189,7 +201,6 @@ def search_maude():
     query_params = []
     if device_generic_name:
         query_params.append(f'device.generic_name:"{device_generic_name}"')
-    
 
     # Construct the final query string
     query = ' AND '.join(query_params)
@@ -311,6 +322,79 @@ def search_ca_business_entity():
     except requests.RequestException as e:
         logging.error(f"Error fetching data from CA Secretary of State business search: {e}")
         return jsonify({"error": "Failed to fetch data from the website", "details": str(e)}), 500
+
+
+serp_client = serpapi.Client(api_key=os.getenv('FDA_API_KEY'))
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route("/serpapi-upload", methods=["GET", "POST"])
+def upload_file():
+    if request.method == "POST":
+        # check if the post request has the file part
+        if "file" not in request.files:
+            flash("No file part")
+            return redirect(request.url)
+        file = request.files["file"]
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == "":
+            flash("No selected file")
+            return redirect(request.url)
+        # if file is allowed upload to /uploads
+        if file and allowed_file(file.filename):
+            # filename = secure_filename(file.filename)
+            filename = str(uuid.uuid4()) + ".png"
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+            # setup google reverse image search
+            params = {
+                "engine": "google_reverse_image",
+                "image_url": "http://"
+                + PUBLIC_IP
+                + ":5001"
+                + "/serpapi-uploads/"
+                + filename,
+            }
+            search = serp_client.search(params)
+
+            # parsing results, looking for object name
+            results = search.as_dict()
+
+            # if "search_information" in results:
+            #     results = results["search_information"]["query_displayed"]
+            # else:
+            #     results = "object not recognized"
+
+            # automatically remove files 3 days old
+            for f in os.listdir(UPLOAD_FOLDER):
+                path = os.path.join(UPLOAD_FOLDER, f)
+
+                if os.stat(path).st_mtime <= (time.time() - MAX_FILE_TIME):
+                    if os.path.isfile(path):
+                        try:
+                            os.remove(path)
+                        except:
+                            print("Cannot remove file", path)
+
+            return results
+    return """
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    """
+
+
+@app.route("/serpapi-uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 # Run the Flask app on the specified host and port
 if __name__ == "__main__":
