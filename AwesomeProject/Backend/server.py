@@ -255,7 +255,7 @@ def search_openhistorical():
             }
         )
 
-    url = "http://172.17.0.1:9200/document-with-vector/_search"
+    url = "http://localhost:9200/document-with-vector/_search"
 
     try:
         logging.info(f"Sending request to FDA OpenHistorical API: {url}")
