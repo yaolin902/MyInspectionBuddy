@@ -58,6 +58,12 @@ services:
     depends_on:
       - elasticsearch
 
+  # flask-vs: # for testing
+  #   container_name: flask-vs
+  #   build: ./
+  #   ports:
+  #     - '8000:80'
+
 networks:
   elk:
     driver: bridge
