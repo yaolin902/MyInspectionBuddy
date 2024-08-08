@@ -4,6 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
+const logQuery = async (current_screen, query) =>
+    await analytics().logEvent('user-query', {
+      from: current_screen,
+      query: query,
+    })
+
 const CAEntitySearchScreen = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const navigation = useNavigation();
@@ -12,6 +18,8 @@ const CAEntitySearchScreen = () => {
         const data = {
             searchTerm
         };
+
+        logQuery("CAEntitySearch", searchTerm);
 
         fetch('http://10.0.0.63:5001/ca-business-entity', { // Update with your server's IP address
             method: 'POST',

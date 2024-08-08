@@ -4,16 +4,26 @@ import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
+const logQuery = async (current_screen, query) =>
+    await analytics().logEvent('user-query', {
+      from: current_screen,
+      query: query,
+    })
+
 const OpenHistoricalSearchScreen = () => {
     const [keyword, setKeyword] = useState('');
     const [year, setYear] = useState('');
     const navigation = useNavigation();
+
+
 
     const fetchData = () => {
         const data = {
             keyword,
             year
         };
+
+        logQuery("OpenHistorical", keyword);
 
         fetch('http://10.0.0.63:5001/openhistorical', { // Update with your server's IP address
             method: 'POST',

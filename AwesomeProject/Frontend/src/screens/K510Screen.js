@@ -5,6 +5,12 @@ import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
+const logQuery = async (current_screen, query) =>
+    await analytics().logEvent('user-query', {
+      from: current_screen,
+      query: query,
+    })
+
 const K510Screen = () => {
     const [fromDate, setFromDate] = useState(new Date());
     const [toDate, setToDate] = useState(new Date());
@@ -16,6 +22,7 @@ const K510Screen = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const navigation = useNavigation();
+
 
     const onChangeFrom = (event, selectedDate) => {
         const currentDate = selectedDate || fromDate;
@@ -30,6 +37,7 @@ const K510Screen = () => {
     };
 
     const handleSearch = async () => {
+        logQuery("K510", k510Number);
         setIsLoading(true);
         setError('');
         try {

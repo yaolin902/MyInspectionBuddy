@@ -5,6 +5,12 @@ import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
+const logQuery = async (current_screen, query) =>
+    await analytics().logEvent('user-query', {
+      from: current_screen,
+      query: query,
+    })
+
 const CDPHScreen = () => {
     const [deviceName, setDeviceName] = useState('');
     const [firmName, setFirmName] = useState('');
@@ -13,6 +19,7 @@ const CDPHScreen = () => {
     const navigation = useNavigation();
 
     const handleSearch = async () => {
+        logQuery("CDPH", deviceName);
         setIsLoading(true);
         setError('');
         try {

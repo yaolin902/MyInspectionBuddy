@@ -4,6 +4,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 const { width } = Dimensions.get('window');
 
+const logQuery = async (current_screen, query) =>
+    await analytics().logEvent('user-query', {
+      from: current_screen,
+      query: query,
+    })
+
 const FDAScreen = ({ navigation }) => {
     const [fromDate, setFromDate] = useState(new Date());
     const [toDate, setToDate] = useState(new Date());
@@ -15,6 +21,7 @@ const FDAScreen = ({ navigation }) => {
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+
 
     const onChangeFrom = (event, selectedDate) => {
         const currentDate = selectedDate || fromDate;
@@ -29,6 +36,7 @@ const FDAScreen = ({ navigation }) => {
     };
 
     const handleSearch = async () => {
+        logQuery("FDA", recallingFirm);
         setIsLoading(true);
         setError('');
         try {
