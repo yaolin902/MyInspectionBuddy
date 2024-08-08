@@ -281,8 +281,43 @@ def search_openhistorical():
         return jsonify(results)
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA OpenHistorical API: {e}")
+        pass
+
+    # Construct the query parameters
+    query_params = []
+    if keyword:
+        query_params.append(f'text:"{keyword}"')
+    if year:
+        query_params.append(f"year:{year}")
+
+    query_string = " AND ".join(query_params)
+    url = f"https://api.fda.gov/other/historicaldocument.json?api_key=e3oka6wF312QcwuJguDeXVEN6XGyeJC94Hirijj8&search={query_string}&limit=100"
+
+    try:
+        logging.info(f"Sending request to FDA OpenHistorical API: {url}")
+        response = requests.get(url)
+        response.raise_for_status()
+
+        response_data = response.json()
+
+        # Ensure we correctly handle the API response structure
+        results = [
+            {
+                "num_of_pages": document.get("num_of_pages", "N/A"),
+                "year": document.get("year", "N/A"),
+                "text": document.get("text", "N/A"),
+                "doc_type": document.get("doc_type", "N/A"),
+            }
+            for document in response_data.get("results", [])
+        ]
+
+        return jsonify(results)
+    except requests.RequestException as e:
+        logging.error(f"Error fetching data from FDA OpenHistorical API: {e}")
         return (
-            jsonify({"error": "Failed to fetch data from the API", "details": str(e)}), 500)
+            jsonify({"error": "Failed to fetch data from the API", "details": str(e)}),
+            500,
+        )
 
 # Define a new route for CA business entity keyword search
 @app.route("/ca-business-entity", methods=['POST'])
