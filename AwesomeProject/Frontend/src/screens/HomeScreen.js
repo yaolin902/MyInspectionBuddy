@@ -1,7 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions } from 'react-native';
+import analytics from '@react-native-firebase/analytics';
+
 
 const { width, height } = Dimensions.get('window');
+
+const logPressEvent = async (description) =>
+  await analytics().logEvent('homeNavigation', {
+    id: 3745092,
+    eventDescription: description,
+  })
 
 const HomeScreen = ({ navigation }) => {
   return (
@@ -15,31 +23,31 @@ const HomeScreen = ({ navigation }) => {
       </TouchableOpacity>
       <View style={styles.middleContainer}>
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.button, styles.button1]} onPress={() => navigation.navigate('FDA')}>
+          <TouchableOpacity style={[styles.button, styles.button1]} onPress={() => {logPressEvent("navigateToFDA"); navigation.navigate('FDA')}}>
             <Text style={styles.buttonText}>FDA Enforcement</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button2]} onPress={() => navigation.navigate('K510')}>
+          <TouchableOpacity style={[styles.button, styles.button2]} onPress={() => {logPressEvent("navigateToFDA"); navigation.navigate('K510')}}>
             <Text style={styles.buttonText}>510k</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.button, styles.button3]} onPress={() => navigation.navigate('Maude')}>
+          <TouchableOpacity style={[styles.button, styles.button3]} onPress={() => {logPressEvent("navigateToFDA"); navigation.navigate('Maude')}}>
             <Text style={styles.buttonText}>MAUDE</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button4]} onPress={() => navigation.navigate('CDPH')}>
+          <TouchableOpacity style={[styles.button, styles.button4]} onPress={() => {logPressEvent("navigateToFDA"); navigation.navigate('CDPH')}}>
             <Text style={styles.buttonText}>CDPH Medical Device Page</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.button, styles.button5]} onPress={() => navigation.navigate('OpenHistoricalScreen')}>
+          <TouchableOpacity style={[styles.button, styles.button5]} onPress={() => {logPressEvent("navigateToFDA"); navigation.navigate('OpenHistoricalScreen')}}>
             <Text style={styles.buttonText}>Historical Documents</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button6]} onPress={() => navigation.navigate('WarningLetter')}>
+          <TouchableOpacity style={[styles.button, styles.button6]} onPress={() => {logPressEvent("navigateToFDA"); navigation.navigate('WarningLetter')}}>
             <Text style={styles.buttonText}>FDA Warning Letter Database</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.button, styles.button7]} onPress={() => navigation.navigate('CAEntitySearchScreen')}>
+          <TouchableOpacity style={[styles.button, styles.button7]} onPress={() => {logPressEvent("navigateToFDA"); navigation.navigate('CAEntitySearchScreen')}}>
             <Text style={styles.buttonText}>CA Business Entity Search</Text>
           </TouchableOpacity>
         </View>
