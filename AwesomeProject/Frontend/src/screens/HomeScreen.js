@@ -6,7 +6,7 @@ import analytics from '@react-native-firebase/analytics';
 const { width, height } = Dimensions.get('window');
 
 const logNavigation = async (next_screen) =>
-  await analytics().logEvent('user-navigation', {
+  await analytics().logEvent('user_navigation', {
     from: "homeScreen",
     to: next_screen,
   })

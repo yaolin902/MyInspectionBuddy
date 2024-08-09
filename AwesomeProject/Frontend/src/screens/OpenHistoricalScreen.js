@@ -7,7 +7,7 @@ import analytics from '@react-native-firebase/analytics';
 const { width } = Dimensions.get('window');
 
 const logQuery = async (current_screen, query) =>
-    await analytics().logEvent('user-query', {
+    await analytics().logEvent('user_query', {
       from: current_screen,
       query: query,
     })
