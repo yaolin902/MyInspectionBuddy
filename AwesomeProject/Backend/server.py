@@ -239,6 +239,14 @@ def search_openhistorical():
     if keyword:
         query_params.update(
             {
+                "query": {
+                    "match": {
+                        "text": {
+                            "query": keyword,
+                            "boost": 0.5
+                        }
+                    }
+                },
                 "knn": {
                     "field": "text_embedding.predicted_value",
                     "query_vector_builder": {
@@ -248,10 +256,12 @@ def search_openhistorical():
                         }
                     },
                     "k": 10,
-                    "num_candidates": 10,
+                    "num_candidates": 100,
+                    "boost": 0.2
                 },
                 "fields": ["id", "text", "num_of_pages", "year", "doc_type"],
                 "_source": False,
+                "size": 25
             }
         )
 
