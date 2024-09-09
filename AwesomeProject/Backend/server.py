@@ -300,8 +300,12 @@ def search_openhistorical():
     if year:
         query_params.append(f"year:{year}")
 
+    apikey = os.getenv('FDA_API_KEY')
+    if not apikey:
+        return jsonify({"error": "API key is missing"}), 500
+
     query_string = " AND ".join(query_params)
-    url = f"https://api.fda.gov/other/historicaldocument.json?api_key=e3oka6wF312QcwuJguDeXVEN6XGyeJC94Hirijj8&search={query_string}&limit=100"
+    url = f"https://api.fda.gov/other/historicaldocument.json?api_key={apikey}&search={query_string}&limit=100"
 
     try:
         logging.info(f"Sending request to FDA OpenHistorical API: {url}")
