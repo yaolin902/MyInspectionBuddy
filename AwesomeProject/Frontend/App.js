@@ -16,9 +16,53 @@ import OpenHistoricalResultsScreen from './src/screens/OpenHistoricalResultsScre
 import CAEntitySearchScreen from './src/screens/CAEntitySearchScreen';
 import CAEntityResultsScreen from './src/screens/CAEntityResultsScreen';
 
+import {Alert, BackHandler} from 'react-native';
+import * as Device from 'expo-device';
+import * as Application from 'expo-application';
+import * as Updates from 'expo-updates';
+
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  // checking for insecure iPadOS version
+  const osVersion = Device.osVersion;
+  const splitVersion = osVersion.split(".");
+
+  if (splitVersion[0] != 17 && !(splitVersion[0] == "16" && parseInt(splitVersion[1], 10) >= 9) && !(splitVersion[0] == "15" && parseInt(splitVersion[1], 10) >= 7)) {
+    Alert.alert(
+      "iOS Out of Date",
+      "Your iOS is " + osVersion + ", which is vulnerable to attack. Please update your iOS!",
+      [
+        {
+          text: "OK",
+          onPress: () => BackHandler.exitApp()
+        }
+      ]
+    );
+  }
+
+  // checking for out-of-date app version
+  const appVersion = Application.nativeApplicationVersion;
+  const {
+    currentlyRunning,
+    isUpdateAvailable,
+    isUpdatePending
+  } = Updates.useUpdates();
+
+  if (isUpdateAvailable) {
+    Alert.alert(
+      "app Out of Date",
+      "The version of the app is " + appVersion + ", which is vulnerable to attack. Please update the app!",
+      [
+        {
+          text: "OK",
+          onPress: () => BackHandler.exitApp()
+        }
+      ]
+    );
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
