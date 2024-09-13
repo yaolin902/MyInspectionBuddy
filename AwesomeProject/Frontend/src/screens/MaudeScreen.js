@@ -3,15 +3,11 @@ import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity, Alert 
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import analytics from '@react-native-firebase/analytics';
+import { logQuery } from './HomeScreen';
 
 
 const { width } = Dimensions.get('window');
 
-const logQuery = async (current_screen, query) =>
-  await analytics().logEvent('user_query', {
-    from: current_screen,
-    query: query,
-  })
 
 const MaudeScreen = () => {
   const [deviceName, setDeviceName] = useState('');
@@ -29,7 +25,7 @@ const MaudeScreen = () => {
       fromDate,
       toDate
     };
-    logQuery("K510", k510Number);
+    logQuery("Maude");
 
     fetch('http://10.0.0.63:5001/maude', { 
       method: 'POST',

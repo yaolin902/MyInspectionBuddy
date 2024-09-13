@@ -2,15 +2,11 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Dimensions } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import analytics from '@react-native-firebase/analytics';
+import { logQuery } from './HomeScreen';
 
 
 const { width } = Dimensions.get('window');
 
-const logQuery = async (current_screen, query) =>
-    await analytics().logEvent('user_query', {
-      from: current_screen,
-      query: query,
-    })
 
 const FDAScreen = ({ navigation }) => {
     const [fromDate, setFromDate] = useState(new Date());
@@ -38,7 +34,7 @@ const FDAScreen = ({ navigation }) => {
     };
 
     const handleSearch = async () => {
-        logQuery("FDA", recallingFirm);
+        logQuery("FDA");
         setIsLoading(true);
         setError('');
         try {

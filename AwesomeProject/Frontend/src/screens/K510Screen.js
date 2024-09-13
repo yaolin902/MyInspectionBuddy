@@ -3,15 +3,11 @@ import { StyleSheet, Text, View, TextInput, Button, Dimensions } from 'react-nat
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import analytics from '@react-native-firebase/analytics';
+import { logQuery } from './HomeScreen';
 
 
 const { width } = Dimensions.get('window');
 
-const logQuery = async (current_screen, query) =>
-    await analytics().logEvent('user_query', {
-      from: current_screen,
-      query: query,
-    })
 
 const K510Screen = () => {
     const [fromDate, setFromDate] = useState(new Date());
@@ -39,7 +35,7 @@ const K510Screen = () => {
     };
 
     const handleSearch = async () => {
-        logQuery("K510", k510Number);
+        logQuery("K510");
         setIsLoading(true);
         setError('');
         try {

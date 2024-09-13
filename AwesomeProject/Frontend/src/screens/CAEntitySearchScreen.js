@@ -2,15 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import analytics from '@react-native-firebase/analytics';
+import { logQuery } from './HomeScreen';
 
 
 const { width } = Dimensions.get('window');
-
-const logQuery = async (current_screen, query) =>
-    await analytics().logEvent('user_query', {
-      from: current_screen,
-      query: query,
-    })
 
 const CAEntitySearchScreen = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -21,7 +16,7 @@ const CAEntitySearchScreen = () => {
             searchTerm
         };
 
-        logQuery("CAEntitySearch", searchTerm);
+        logQuery("CAEntitySearch");
 
         fetch('http://10.0.0.63:5001/ca-business-entity', { // Update with your server's IP address
             method: 'POST',

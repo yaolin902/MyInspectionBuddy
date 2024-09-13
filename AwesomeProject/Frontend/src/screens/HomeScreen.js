@@ -1,15 +1,30 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions } from 'react-native';
 import analytics from '@react-native-firebase/analytics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
+const logNavigation = async (screen) => {
+  try {
+    const savedValue = await AsyncStorage.getItem('dataCollectionEnabled');
+    if (savedValue == "true")
+      await analytics().logEvent('userNavigation' + screen);
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+const logQuery = async (screen) => {
+  try {
+    const savedValue = await AsyncStorage.getItem('dataCollectionEnabled');
+    if (savedValue == "true")
+      await analytics().logEvent('userQuery' + screen);
+  } catch(e) {
+    console.error(e);
+  }
+}
 
 const { width, height } = Dimensions.get('window');
-
-const logNavigation = async (next_screen) =>
-  await analytics().logEvent('user_navigation', {
-    from: "homeScreen",
-    to: next_screen,
-  })
 
 const HomeScreen = ({ navigation }) => {
   return (
@@ -49,6 +64,9 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.buttonRow}>
           <TouchableOpacity style={[styles.button, styles.button7]} onPress={() => {logNavigation("CAEntitySearchScreen"); navigation.navigate('CAEntitySearchScreen')}}>
             <Text style={styles.buttonText}>CA Business Entity Search</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.button8]} onPress={() => {logNavigation("PrivacyScreen");navigation.navigate('PrivacyScreen')}}>
+            <Text style={styles.buttonText}>Privacy Policy</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -139,6 +157,9 @@ const styles = StyleSheet.create({
   },
   button7: {
     backgroundColor: '#FFEB3B',
+  },
+  button8: {
+    backgroundColor: '#C2C3C4',
   },
   buttonText: {
     fontSize: 25,
