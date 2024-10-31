@@ -360,7 +360,7 @@ def search_ca_business_entity():
 
         # Use the form data to perform the search
         logging.info(f"Performing search with criteria: {json_data}")
-        response = requests.post(search_url, data=json_data)
+        response = requests.post(search_url, json=json_data)
         response.raise_for_status()
 
         # Parse the search results
