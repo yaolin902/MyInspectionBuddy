@@ -1,0 +1,10 @@
+To re setup ELK stack run the following commands:
+$ docker-compose down
+$ docker-compose up -d
+Wait for a few minutes
+$ docker restart eland
+Wait for a 5 minutes
+$ ./setup-vector-search.sh
+If everything is successful, you should get the output below:
+{"acknowledged":true}{"acknowledged":true,"shards_acknowledged":true,"index":"document-with-vector"}{"task":"##########"}
+
