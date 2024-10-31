@@ -75,7 +75,7 @@ def search_fda():
         return jsonify(response.json())  # Return the JSON response from the API
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA API: {e}")  # Log any errors
-        return jsonify({"error": "Failed to fetch data from the API", "details": str(e)}), 500
+        return jsonify({"error": "Failed to fetch data from the API", "details": str(e).replace(apikey, "<HIDDEN>")}), 500
 
 # Define a new route for K510 database search
 @app.route("/k510", methods=['POST'])
@@ -120,7 +120,7 @@ def search_k510():
         return jsonify(response.json())  # Return the JSON response from the API
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA K510 API: {e}")  # Log any errors
-        return jsonify({"error": "Failed to fetch data from the API", "details": str(e)}), 500
+        return jsonify({"error": "Failed to fetch data from the API", "details": str(e).replace(apikey, "<HIDDEN>")}), 500
 
 # Define a new route for CDPH device recall search
 @app.route("/cdph", methods=['POST'])
@@ -213,7 +213,7 @@ def search_maude():
         return jsonify(response.json())  # Return the JSON response from the API
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA Maude API: {e}")  # Log any errors
-        return jsonify({"error": "Failed to fetch data from the API", "details": str(e)}), 500
+        return jsonify({"error": "Failed to fetch data from the API", "details": str(e).replace(apikey, "<HIDDEN>")}), 500
 
 # Define a new route for OpenHistorical search
 @app.route("/openhistorical", methods=['POST'])
@@ -329,7 +329,7 @@ def search_openhistorical():
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA OpenHistorical API: {e}")
         return (
-            jsonify({"error": "Failed to fetch data from the API", "details": str(e)}),
+            jsonify({"error": "Failed to fetch data from the API", "details": str(e).replace(apikey, "<HIDDEN>")}),
             500,
         )
 
