@@ -357,10 +357,28 @@ def search_ca_business_entity():
             'SEARCH_VALUE': 'test',
             'SEARCH_TYPE_ID': '1',
         }
+        headers = {
+            'User-Agent':
+            'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Referer': 'https://bizfileonline.sos.ca.gov/search/business',
+            'authorization': 'undefined',
+            'content-type': 'application/json',
+            'Origin': 'https://bizfileonline.sos.ca.gov',
+            'Sec-GPC': '1',
+            'Connection': 'keep-alive',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'DNT': '1',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+        }
 
         # Use the form data to perform the search
         logging.info(f"Performing search with criteria: {json_data}")
-        response = requests.post(search_url, json=json_data)
+        response = requests.post(search_url, json=json_data, headers=headers)
         response.raise_for_status()
 
         # Parse the search results
