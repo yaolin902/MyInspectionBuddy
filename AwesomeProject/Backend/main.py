@@ -399,7 +399,8 @@ def search_ca_business_entity():
         return jsonify({"error": "Failed to fetch data from the website", "details": str(e)}), 500
 
 
-serp_client = serpapi.Client(api_key=os.getenv('FDA_API_KEY'))
+serp_client = serpapi.Client(api_key=os.getenv('SERP_API_KEY'))
+
 
 
 def allowed_file(filename):
