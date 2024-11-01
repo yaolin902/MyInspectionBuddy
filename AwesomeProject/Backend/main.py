@@ -2,18 +2,173 @@ import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
+from flask_sqlalchemy import SQLAlchemy
+import sqlite3
+import csv
 import os
 from bs4 import BeautifulSoup
 import re
 from urllib.parse import urljoin
+import time, uuid
+import serpapi
+from flask import send_from_directory, flash, redirect
+from ultralytics import YOLO
+from PIL import Image
+import io
+import numpy as np
+import base64
+import cv2
+import requests as rq
+from datetime import datetime
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+
+
+# define constants
+UPLOAD_FOLDER = "/uploads"
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
+MAX_FILE_TIME = 3 * 86400
+PUBLIC_IP = "api.healthly.dev"
 
 # Initialize the Flask application
 app = Flask(__name__)
 # Enable Cross-Origin Resource Sharing (CORS) for the app
 CORS(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+
+# set up upload config
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO)
+def normalize_legal_name(legal_name):
+    known_exceptions = {"medtronic-minimed-inc": "medtronic-inc"}
+    legal_name_key = re.sub(r'[^a-zA-Z0-9\s]', '', legal_name).replace(' ', '-').lower()
+    return known_exceptions.get(legal_name_key, legal_name_key)
+
+def construct_warning_letter_url(case_injunction_id, action_date, legal_name):
+    base_warning_letter_url = "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters"
+    formatted_date = datetime.strptime(action_date, "%Y-%m-%d").strftime("%m%d%Y")
+    normalized_legal_name = normalize_legal_name(legal_name)
+    return f"{base_warning_letter_url}/{normalized_legal_name}-{case_injunction_id}-{formatted_date}"
+
+# SQLAlchemy configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///contact_info.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # Change this to a secure key
+
+db = SQLAlchemy(app)
+
+# User model
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+
+# Contact model
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    county = db.Column(db.String(100))
+    name = db.Column(db.String(100))
+    address = db.Column(db.String(200))
+    phone = db.Column(db.String(20))
+    fax = db.Column(db.String(20))
+    link_to_website = db.Column(db.String(100))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'county': self.county,
+            'name': self.name,
+            'address': self.address,
+            'phone': self.phone,
+            'fax': self.fax,
+            'link_to_website': self.link_to_website
+        }
+
+# Initialize the database
+with app.app_context():
+    db.create_all()
+    # Check if the database is empty and populate it with data from info.csv if needed
+    if not Contact.query.first():
+        with open('info.csv', mode='r', newline='') as file:
+            csv_reader = csv.reader(file)
+            next(csv_reader)  # Skip header
+            for row in csv_reader:
+                new_contact = Contact(
+                    county=row[0],
+                    name=row[1],
+                    address=row[2],
+                    phone=row[3],
+                    fax=row[4],
+                    link_to_website=row[5]
+                )
+                db.session.add(new_contact)
+            db.session.commit()
+        logging.info("Database populated with initial data from info.csv")
+
+# User registration route
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required"}), 400
+
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    new_user = User(username=username, password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "User registered successfully"}), 201
+
+# User login route
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    user = User.query.filter_by(username=username).first()
+
+    if user and bcrypt.check_password_hash(user.password, password):
+        access_token = create_access_token(identity={'username': user.username})
+        return jsonify(access_token=access_token), 200
+
+    return jsonify({"error": "Invalid credentials"}), 401
+
+# Protected route
+@app.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
+
+# Define the route for managing district attorney office contacts
+@app.route("/contacts", methods=['GET', 'POST'])
+def manage_contacts():
+    if request.method == 'GET':
+        contacts = Contact.query.all()
+        if not contacts:
+            logging.info("No contacts found in the database.")
+        return jsonify([contact.to_dict() for contact in contacts])
+
+    if request.method == 'POST':
+        data = request.get_json()
+        new_contact = Contact(
+            county=data['county'],
+            name=data['name'],
+            address=data['address'],
+            phone=data['phone'],
+            fax=data.get('fax'),
+            link_to_website=data.get('link_to_website')
+        )
+        db.session.add(new_contact)
+        db.session.commit()
+        return jsonify(new_contact.to_dict()), 201
 
 # Define a route for the root URL that accepts POST requests
 @app.route("/", methods=['POST'])
@@ -62,7 +217,7 @@ def search_fda():
         return jsonify(response.json())  # Return the JSON response from the API
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA API: {e}")  # Log any errors
-        return jsonify({"error": "Failed to fetch data from the API", "details": str(e)}), 500
+        return jsonify({"error": "Failed to fetch data from the API", "details": str(e).replace(apikey, "<HIDDEN>")}), 500
 
 # Define a new route for K510 database search
 @app.route("/k510", methods=['POST'])
@@ -95,7 +250,6 @@ def search_k510():
         query_params.append(f'applicant:"{applicant_name}"')
     if device_name:
         query_params.append(f'device_name:"{device_name}"')
-    
 
     # Construct the final query string
     query = ' AND '.join(query_params)
@@ -108,7 +262,7 @@ def search_k510():
         return jsonify(response.json())  # Return the JSON response from the API
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA K510 API: {e}")  # Log any errors
-        return jsonify({"error": "Failed to fetch data from the API", "details": str(e)}), 500
+        return jsonify({"error": "Failed to fetch data from the API", "details": str(e).replace(apikey, "<HIDDEN>")}), 500
 
 # Define a new route for CDPH device recall search
 @app.route("/cdph", methods=['POST'])
@@ -189,7 +343,6 @@ def search_maude():
     query_params = []
     if device_generic_name:
         query_params.append(f'device.generic_name:"{device_generic_name}"')
-    
 
     # Construct the final query string
     query = ' AND '.join(query_params)
@@ -202,7 +355,7 @@ def search_maude():
         return jsonify(response.json())  # Return the JSON response from the API
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA Maude API: {e}")  # Log any errors
-        return jsonify({"error": "Failed to fetch data from the API", "details": str(e)}), 500
+        return jsonify({"error": "Failed to fetch data from the API", "details": str(e).replace(apikey, "<HIDDEN>")}), 500
 
 # Define a new route for OpenHistorical search
 @app.route("/openhistorical", methods=['POST'])
@@ -211,21 +364,90 @@ def search_openhistorical():
     data = request.get_json()
     logging.info(f"OpenHistorical request data: {data}")
 
-    keyword = data.get('keyword', '')
-    year = data.get('year', '')
+    keyword = data.get("keyword", "")
+    year = data.get("year", "")
 
     if not keyword:
         return jsonify({"error": "Keyword is required"}), 400
+
+    # Construct the query parameters
+    query_params = {}
+    if year:
+        query_params.update(
+            {
+                "query": {"term": {"year": year}},
+            }
+        )
+    if keyword:
+        query_params.update(
+            {
+                "query": {
+                    "match": {
+                        "text": {
+                            "query": keyword,
+                            "boost": 0.5
+                        }
+                    }
+                },
+                "knn": {
+                    "field": "text_embedding.predicted_value",
+                    "query_vector_builder": {
+                        "text_embedding": {
+                            "model_id": "sentence-transformers__msmarco-minilm-l12-cos-v5",
+                            "model_text": keyword,
+                        }
+                    },
+                    "k": 10,
+                    "num_candidates": 100,
+                    "boost": 0.2
+                },
+                "fields": ["id", "text", "num_of_pages", "year", "doc_type"],
+                "_source": False,
+                "size": 25
+            }
+        )
+
+    url = "http://localhost:9200/document-with-vector/_search"
+
+    try:
+        logging.info(f"Sending request to FDA OpenHistorical API: {url}")
+        response = requests.get(
+            url, json=query_params, headers={"Content-Type": "application/json"}
+        )
+        response.raise_for_status()
+
+        response_data = response.json()
+
+        # Ensure we correctly handle the API response structure
+        hits = response_data.get("hits", {}).get("hits", [])
+        results = [
+            {
+                "num_of_pages": document.get("fields").get("num_of_pages", "N/A")[0],
+                "year": document.get("fields").get("year", "N/A")[0],
+                "text": document.get("fields").get("text", "N/A")[0],
+                "doc_type": document.get("fields").get("doc_type", "N/A")[0],
+            }
+            for document in hits
+        ]
+
+        return jsonify(results)
+    except requests.RequestException as e:
+        logging.error(f"Error fetching data from FDA OpenHistorical API: {e}")
+        pass
 
     # Construct the query parameters
     query_params = []
     if keyword:
         query_params.append(f'text:"{keyword}"')
     if year:
-        query_params.append(f'year:{year}')
+        query_params.append(f"year:{year}")
 
-    query_string = ' AND '.join(query_params)
-    url = f"https://api.fda.gov/other/historicaldocument.json?api_key=e3oka6wF312QcwuJguDeXVEN6XGyeJC94Hirijj8&search={query_string}&limit=100"
+    apikey = os.getenv('FDA_API_KEY')
+    if not apikey:
+        return jsonify({"error": "API key is missing"}), 500
+
+    query_string = " AND ".join(query_params)
+    url = f"https://api.fda.gov/other/historicaldocument.json?api_key={apikey}&search={query_string}&limit=100"
 
     try:
         logging.info(f"Sending request to FDA OpenHistorical API: {url}")
@@ -235,17 +457,23 @@ def search_openhistorical():
         response_data = response.json()
 
         # Ensure we correctly handle the API response structure
-        results = [{
-            "num_of_pages": document.get('num_of_pages', 'N/A'),
-            "year": document.get('year', 'N/A'),
-            "text": document.get('text', 'N/A'),
-            "doc_type": document.get('doc_type', 'N/A')
-        } for document in response_data.get('results', [])]
+        results = [
+            {
+                "num_of_pages": document.get("num_of_pages", "N/A"),
+                "year": document.get("year", "N/A"),
+                "text": document.get("text", "N/A"),
+                "doc_type": document.get("doc_type", "N/A"),
+            }
+            for document in response_data.get("results", [])
+        ]
 
         return jsonify(results)
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA OpenHistorical API: {e}")
-        return jsonify({"error": "Failed to fetch data from the API", "details": str(e)}), 500
+        return (
+            jsonify({"error": "Failed to fetch data from the API", "details": str(e).replace(apikey, "<HIDDEN>")}),
+            500,
+        )
 
 # Define a new route for CA business entity keyword search
 @app.route("/ca-business-entity", methods=['POST'])
@@ -312,6 +540,164 @@ def search_ca_business_entity():
         logging.error(f"Error fetching data from CA Secretary of State business search: {e}")
         return jsonify({"error": "Failed to fetch data from the website", "details": str(e)}), 500
 
+
+serp_client = serpapi.Client(api_key=os.getenv('SERP_API_KEY'))
+
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route("/serpapi-upload", methods=["GET", "POST"])
+def upload_file():
+    if request.method == "POST":
+        # check if the post request has the file part
+        if "file" not in request.files:
+            flash("No file part")
+            return redirect(request.url)
+        file = request.files["file"]
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == "":
+            flash("No selected file")
+            return redirect(request.url)
+        # if file is allowed upload to /uploads
+        if file and allowed_file(file.filename):
+            # filename = secure_filename(file.filename)
+            filename = str(uuid.uuid4()) + ".png"
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+            # setup google reverse image search
+            params = {
+                "engine": "google_reverse_image",
+                "image_url": "https://"
+                + PUBLIC_IP
+                + "/serpapi-uploads/"
+                + filename,
+            }
+            search = serp_client.search(params)
+
+            # parsing results, looking for object name
+            results = search.as_dict()
+
+            if "search_information" in results:
+                results = results["search_information"]["query_displayed"]
+            else:
+                results = "object not recognized"
+
+            # automatically remove files 3 days old
+            for f in os.listdir(UPLOAD_FOLDER):
+                path = os.path.join(UPLOAD_FOLDER, f)
+
+                if os.stat(path).st_mtime <= (time.time() - MAX_FILE_TIME):
+                    if os.path.isfile(path):
+                        try:
+                            os.remove(path)
+                        except:
+                            print("Cannot remove file", path)
+
+            return results
+    return """
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    """
+
+
+@app.route("/serpapi-uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+
+# Initialize the YOLO model
+model = YOLO("last.pt")
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        file = request.files['file'].read()
+        image = Image.open(io.BytesIO(file)).convert("RGB")
+        image_np = np.array(image)
+
+        results = model.predict(source=image_np, save=True)
+
+        result_image_path = "runs/detect/predict7/result.png"
+        cv2.imwrite(result_image_path, results[0].plot())
+
+        with open(result_image_path, "rb") as image_file:
+            img_str = base64.b64encode(image_file.read()).decode("utf-8")
+
+        return jsonify({'result': img_str})
+    except Exception as e:
+        logging.error(f"Error in prediction: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/warning_letters", methods=['POST'])
+def search_warning_letters():
+    data = request.get_json()
+    keyword = data.get('firmName', '')  # Assume 'firmName' is sent as the keyword
+
+    logging.info(f"Received keyword: {keyword}")  # Log the received keyword
+
+    api_url = 'https://api-datadashboard.fda.gov/v1/compliance_actions'
+    request_body = {
+        "start": 1,
+        "rows": 50,
+        "returntotalcount": "true",
+        "sort": "ActionTakenDate",
+        "sortorder": "DESC",
+        "filters": {
+            "ProductType": ["Biologics", "Devices"],
+            "ActionType": ["Warning Letter"],
+            "LegalName": [keyword]
+        },
+        "columns": [
+            "FirmProfile",
+            "FEINumber",
+            "ActionType",
+            "State",
+            "ActionTakenDate",
+            "LegalName",
+            "CaseInjunctionID"  # Add CaseInjunctionID column
+        ]
+    }
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization-User': os.getenv('AUTHORIZATION_USER'),  # Should ideally be secured
+        'Authorization-Key': os.getenv('AUTHORIZATION_KEY')  # Should ideally be secured
+    }
+
+    try:
+        response = rq.post(api_url, json=request_body, headers=headers)
+        response.raise_for_status()  # Will raise an HTTPError if the HTTP request returned an unsuccessful status code
+        out = response.json()
+        
+        logging.info(f"API response: {out}")  # Log the API response
+
+        # Construct URLs to warning letters and add to response data
+        results = []
+        for result in out.get('result', []):  # Corrected to 'result'
+            logging.info(f"Processing result: {result}")  # Log each result being processed
+            if all(key in result for key in ['CaseInjunctionID', 'ActionTakenDate', 'LegalName']):
+                warning_letter_url = construct_warning_letter_url(
+                    result['CaseInjunctionID'], result['ActionTakenDate'], result['LegalName'])
+                result['warning_letter_url'] = warning_letter_url
+                results.append(result)
+
+        logging.info(f"Processed results: {results}")  # Log the processed results
+        return jsonify(results)
+    except rq.RequestException as e:
+        logging.error(f"Error fetching data from FDA API: {e}")  # Log any errors
+        return jsonify({"error": "Failed to fetch data from FDA API", "details": str(e)}), 500
+
+
+
 # Run the Flask app on the specified host and port
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=80)
