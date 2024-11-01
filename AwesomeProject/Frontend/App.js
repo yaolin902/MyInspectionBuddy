@@ -15,6 +15,14 @@ import OpenHistoricalScreen from './src/screens/OpenHistoricalScreen';
 import OpenHistoricalResultsScreen from './src/screens/OpenHistoricalResultsScreen';
 import CAEntitySearchScreen from './src/screens/CAEntitySearchScreen';
 import CAEntityResultsScreen from './src/screens/CAEntityResultsScreen';
+import ContactFetchScreen from './src/screens/ContactFetchScreen';
+import PredictScreen from './src/screens/PredictScreen';
+import WarningLetterScreen from './src/screens/WarningLetterScreen';
+import WarningLetterResultsScreen from './src/screens/WarningLetterResultsScreen';
+import LoginScreen from './src/screens/LoginScreen'; // Import the LoginScreen
+import signUpScreen from './src/screens/signUpScreen'; // Import the SignUpScreen
+import ProtectedScreen from './src/screens/ProtectedScreen'; // Import the ProtectedScreen
+import SAPScreen from './src/screens/SAPScreen'
 
 import {Alert, BackHandler} from 'react-native';
 import * as Device from 'expo-device';
@@ -66,6 +74,9 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} /> 
+        <Stack.Screen name="signUp" component={signUpScreen} options={{ headerShown: false }} /> 
+        <Stack.Screen name="Protected" component={ProtectedScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="FDA" component={FDAScreen} />
         <Stack.Screen name="K510" component={K510Screen} />
@@ -80,6 +91,11 @@ export default function App() {
         <Stack.Screen name="OpenHistoricalResultsScreen" component={OpenHistoricalResultsScreen} />
         <Stack.Screen name="CAEntitySearchScreen" component={CAEntitySearchScreen} />
         <Stack.Screen name="CAEntityResultsScreen" component={CAEntityResultsScreen} />
+        <Stack.Screen name="ContactFetchScreen" component={ContactFetchScreen} />
+        <Stack.Screen name="PredictScreen" component={PredictScreen} />
+        <Stack.Screen name="WarningLetterScreen" component={WarningLetterScreen} />
+        <Stack.Screen name="WarningLetterResultsScreen" component={WarningLetterResultsScreen} />
+        <Stack.Screen name="SAPScreen" component={SAPScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>
