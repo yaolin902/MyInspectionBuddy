@@ -3,3 +3,11 @@ serpapi
 beautifulsoup4
 requests
 flask-cors
+flask-sqlalchemy
+pysqlite3
+ultralytics
+pillow
+numpy
+opencv-python
+flask-bcrypt
+flask-jwt-extended
