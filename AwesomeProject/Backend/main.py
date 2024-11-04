@@ -488,52 +488,54 @@ def search_ca_business_entity():
         return jsonify({"error": "Search term is required"}), 400
 
     # Build the search URL for the new data source
-    search_url = "https://bizfileonline.sos.ca.gov/search/business"
-
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': 'https://bizfileonline.sos.ca.gov/',
-        'Origin': 'https://bizfileonline.sos.ca.gov'
-    }
+    search_url = "https://bizfileonline.sos.ca.gov/api/Records/businesssearch"
 
     try:
         # Perform the initial request to get the search page
         logging.info(f"Sending initial request to CA Secretary of State business search: {search_url}")
-        initial_response = requests.get(search_url, headers=headers)
-        initial_response.raise_for_status()
 
         # Parse the search page to get the necessary form data and cookies
-        soup = BeautifulSoup(initial_response.content, 'html.parser')
-        form_data = {
-            "SearchType": "CORP",
-            "SearchCriteria": search_term,
-            "SearchSubType": "Keyword"
+        json_data = {
+            'SEARCH_VALUE': 'test',
+            'SEARCH_TYPE_ID': '1',
+        }
+        headers = {
+            'User-Agent':
+            'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Referer': 'https://bizfileonline.sos.ca.gov/search/business',
+            'authorization': 'undefined',
+            'content-type': 'application/json',
+            'Origin': 'https://bizfileonline.sos.ca.gov',
+            'Sec-GPC': '1',
+            'Connection': 'keep-alive',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'DNT': '1',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
         }
 
         # Use the form data to perform the search
-        logging.info(f"Performing search with criteria: {form_data}")
-        response = requests.post(search_url, data=form_data, headers=headers, cookies=initial_response.cookies)
+        logging.info(f"Performing search with criteria: {json_data}")
+        response = requests.post(search_url, json=json_data, headers=headers)
         response.raise_for_status()
 
         # Parse the search results
-        soup = BeautifulSoup(response.content, 'html.parser')
+        table_rows = response.json()["rows"]
         results = []
-
-        # Example scraping logic: Extract table rows containing the business entity data
-        table_rows = soup.select('table tbody tr')
-        for row in table_rows:
-            cells = row.find_all('td')
-            if len(cells) > 0:
-                result = {
-                    "entityInformation": cells[0].text.strip(),
-                    "initialFilingDate": cells[1].text.strip(),
-                    "status": cells[2].text.strip(),
-                    "entityType": cells[3].text.strip(),
-                    "formedIn": cells[4].text.strip(),
-                    "agent": cells[5].text.strip() if len(cells) > 5 else 'N/A'
-                }
-                results.append(result)
+        for k, v in table_rows.items():
+            result = {
+                "entityInformation": v["TITLE"][0],
+                "initialFilingDate": v["FILING_DATE"],
+                "status": v["STATUS"],
+                "entityType": v["ENTITY_TYPE"],
+                "formedIn": v["FORMED_IN"],
+                "agent": v["AGENT"]
+            }
+            results.append(result)
 
         return jsonify(results)
     except requests.RequestException as e:
