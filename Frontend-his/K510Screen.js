@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     StyleSheet,
     Text,
@@ -8,13 +8,14 @@ import {
     ScrollView,
     ActivityIndicator,
     Alert,
-    Platform // Added Platform import
+    Platform,
+    TouchableOpacity,
+    FlatList
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
 import SearchHistoryService from './SearchHistoryService';
-
 
 const K510Screen = () => {
     const [k510Number, setK510Number] = useState('');
@@ -26,44 +27,93 @@ const K510Screen = () => {
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const navigation = useNavigation();
 
-    const parseDateFromString = (dateString) => {
-        if (!dateString) return null;
+    useEffect(() => {
+        loadHistoricalSearches();
+    }, []);
+
+    const loadHistoricalSearches = async () => {
         try {
-            let date;
-            if (dateString.includes('T')) {
-                date = new Date(dateString);
-            } else {
-                const [year, month, day] = dateString.split('-').map(Number);
-                date = new Date(year, month - 1, day);
-            }
-            return date;
+            const history = await SearchHistoryService.getHistory('K510');
+            // Store complete history items in suggestions
+            setSuggestions(history);
         } catch (error) {
-            console.error('Error parsing date:', error);
-            return null;
+            console.error('Error loading historical searches:', error);
         }
+    };
+
+    const handleK510NumberChange = (text) => {
+        setK510Number(text);
+        setShowSuggestions(text.length > 0);
+    };
+
+    const handleSuggestionSelect = (historyItem) => {
+        // Use the complete history item to set all fields
+        setK510Number(historyItem.k510Number || '');
+        setApplicantName(historyItem.applicantName || '');
+        setDeviceName(historyItem.deviceName || '');
+
+        // Handle dates
+        if (historyItem.fromDate) {
+            const parsedFromDate = new Date(historyItem.fromDate);
+            if (!isNaN(parsedFromDate.getTime())) {
+                setFromDate(parsedFromDate);
+            }
+        }
+
+        if (historyItem.toDate) {
+            const parsedToDate = new Date(historyItem.toDate);
+            if (!isNaN(parsedToDate.getTime())) {
+                setToDate(parsedToDate);
+            }
+        }
+
+        setShowSuggestions(false);
+    };
+
+
+    const renderSuggestions = () => {
+        if (!showSuggestions || !k510Number.trim()) return null;
+
+        const filteredSuggestions = suggestions.filter(suggestion =>
+            suggestion.k510Number.toLowerCase().includes(k510Number.toLowerCase())
+        );
+
+        if (filteredSuggestions.length === 0) return null;
+
+        return (
+            <View style={styles.suggestionsContainer}>
+                {filteredSuggestions.map((suggestion, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        style={styles.suggestionItem}
+                        onPress={() => handleSuggestionSelect(suggestion)}
+                    >
+                        <Text style={styles.suggestionText}>
+                            <Text style={styles.suggestionValue}>{suggestion.k510Number}</Text>
+                            {suggestion.deviceName ?
+                                `\n${suggestion.deviceName}` : ''}
+                            {suggestion.applicantName ?
+                                `\n${suggestion.applicantName}` : ''}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        );
     };
 
     const handleHistorySelect = (historyItem) => {
         setK510Number(historyItem.k510Number || '');
         setApplicantName(historyItem.applicantName || '');
         setDeviceName(historyItem.deviceName || '');
-
-        // Handle fromDate
         if (historyItem.fromDate) {
-            const parsedFromDate = parseDateFromString(historyItem.fromDate);
-            if (parsedFromDate && !isNaN(parsedFromDate.getTime())) {
-                setFromDate(parsedFromDate);
-            }
+            setFromDate(new Date(historyItem.fromDate));
         }
-
-        // Handle toDate
         if (historyItem.toDate) {
-            const parsedToDate = parseDateFromString(historyItem.toDate);
-            if (parsedToDate && !isNaN(parsedToDate.getTime())) {
-                setToDate(parsedToDate);
-            }
+            setToDate(new Date(historyItem.toDate));
         }
     };
 
@@ -87,6 +137,7 @@ const K510Screen = () => {
 
         setIsLoading(true);
         setError('');
+        setShowSuggestions(false);
 
         const searchParams = {
             k510Number: k510Number.trim(),
@@ -97,8 +148,8 @@ const K510Screen = () => {
         };
 
         try {
-            // Save search history immediately
             await SearchHistoryService.saveSearch('K510', searchParams);
+            await loadHistoricalSearches(); // Reload suggestions after new search
 
             const response = await fetch('http://10.0.0.63:5001/k510', {
                 method: 'POST',
@@ -152,8 +203,10 @@ const K510Screen = () => {
                         style={styles.input}
                         placeholder="Enter 510(k) Number"
                         value={k510Number}
-                        onChangeText={setK510Number}
+                        onChangeText={handleK510NumberChange}
+                        onFocus={() => setShowSuggestions(true)}
                     />
+                    {renderSuggestions()}
 
                     <Text style={styles.label}>Applicant Name:</Text>
                     <TextInput
@@ -161,6 +214,7 @@ const K510Screen = () => {
                         placeholder="Enter Applicant Name"
                         value={applicantName}
                         onChangeText={setApplicantName}
+                        onFocus={() => setShowSuggestions(false)}
                     />
 
                     <Text style={styles.label}>Device Name:</Text>
@@ -169,6 +223,7 @@ const K510Screen = () => {
                         placeholder="Enter Device Name"
                         value={deviceName}
                         onChangeText={setDeviceName}
+                        onFocus={() => setShowSuggestions(false)}
                     />
                 </View>
 
@@ -207,20 +262,19 @@ const K510Screen = () => {
                     )}
                 </View>
 
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title={isLoading ? "Searching..." : "Search"}
-                        onPress={handleSearch}
-                        disabled={isLoading}
-                    />
-                </View>
+                <TouchableOpacity
+                    style={[styles.searchButton, isLoading && styles.searchButtonDisabled]}
+                    onPress={handleSearch}
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <ActivityIndicator color="#FFFFFF" />
+                    ) : (
+                        <Text style={styles.searchButtonText}>Search</Text>
+                    )}
+                </TouchableOpacity>
 
                 {error ? <Text style={styles.errorText}>{error}</Text> : null}
-                {isLoading && (
-                    <View style={styles.loadingContainer}>
-                        <ActivityIndicator size="large" color="#0000ff" />
-                    </View>
-                )}
 
                 <Text style={styles.note}>
                     Note: Enter at least one search criterion
@@ -244,6 +298,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
+        color: '#333',
     },
     inputContainer: {
         marginBottom: 20,
@@ -252,25 +307,34 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 5,
         fontWeight: '500',
+        color: '#333',
     },
     input: {
         borderWidth: 1,
         borderColor: '#ddd',
-        borderRadius: 5,
-        padding: 10,
+        borderRadius: 8,
+        padding: 12,
         marginBottom: 15,
         backgroundColor: '#f9f9f9',
+        fontSize: 16,
     },
     dateContainer: {
         marginBottom: 15,
     },
-    buttonContainer: {
-        marginTop: 10,
-        marginBottom: 20,
-    },
-    loadingContainer: {
-        marginTop: 20,
+    searchButton: {
+        backgroundColor: '#007AFF',
+        padding: 15,
+        borderRadius: 8,
         alignItems: 'center',
+        marginTop: 10,
+    },
+    searchButtonDisabled: {
+        backgroundColor: '#999',
+    },
+    searchButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '600',
     },
     errorText: {
         color: 'red',
@@ -278,11 +342,33 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     note: {
-        color: 'gray',
+        color: '#666',
         fontSize: 12,
         marginTop: 10,
         textAlign: 'center',
         fontStyle: 'italic',
+    },
+    suggestionsContainer: {
+        marginTop: -10,
+        marginBottom: 10,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        maxHeight: 200,
+    },
+    suggestionItem: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    suggestionText: {
+        fontSize: 14,
+        color: '#333',
+    },
+    suggestionValue: {
+        color: '#007AFF',
+        fontWeight: '500',
     }
 });
 
