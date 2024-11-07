@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import * as Location from 'expo-location';
+
 const { width } = Dimensions.get('window');
 
 const CAEntitySearchScreen = () => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
     const navigation = useNavigation();
 
     const fetchData = () => {
@@ -13,6 +17,7 @@ const CAEntitySearchScreen = () => {
             searchTerm
         };
 
+        console.log(data);
         fetch('http://10.0.0.63:5001/ca-business-entity', { // Update with your server's IP address
             method: 'POST',
             headers: {
@@ -35,6 +40,27 @@ const CAEntitySearchScreen = () => {
         });
     };
 
+    const getLocation = async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+            return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+        console.log(location["coords"]["latitude"], location["coords"]["longitude"]);
+
+        fetch('https://gis.cdph.ca.gov/gisadmin/rest/services/Geocoding/USA2023R4/GeocodeServer/reverseGeocode?location=' + location["coords"]["longitude"] + '%2C' + location["coords"]["latitude"] + '&langCode=&locationType=&featureTypes=locality&outSR=&preferredLabelValues=&f=pjson', {
+            method: 'GET'
+        })
+        .then(reponse => reponse.json())
+        .then(result => {
+            console.log(result["address"]["City"]);
+            setSearchTerm(result["address"]["City"]);
+        });
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>CA Business Entity Search</Text>
@@ -47,6 +73,9 @@ const CAEntitySearchScreen = () => {
                     value={searchTerm}
                     onChangeText={setSearchTerm}
                 />
+                <TouchableOpacity style={styles.searchButton} onPress={getLocation}>
+                    <Text>Use My Location</Text>
+                </TouchableOpacity>
             </View>
 
             <TouchableOpacity style={styles.searchButton} onPress={fetchData}>
