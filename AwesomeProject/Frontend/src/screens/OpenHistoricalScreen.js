@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { BACKEND_URL } from '../../config.js';
 
 const { width } = Dimensions.get('window');
 
@@ -15,7 +16,7 @@ const OpenHistoricalSearchScreen = () => {
             year
         };
 
-        fetch('http://10.0.0.63:5001/openhistorical', { // Update with your server's IP address
+        fetch(`${BACKEND_URL}/openhistorical`, { // Update with your server's IP address
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

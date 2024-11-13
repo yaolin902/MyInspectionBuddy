@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { BACKEND_URL } from '../../config.js';
 
 const WarningLetterScreen = () => {
     const [keyword, setKeyword] = useState('');
     const navigation = useNavigation();
 
     const fetchData = () => {
-        fetch('http://10.0.0.3:5001/warning_letters', { 
+        fetch(`${BACKEND_URL}/warning_letters`, { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

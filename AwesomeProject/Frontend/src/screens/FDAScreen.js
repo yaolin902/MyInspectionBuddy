@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Dimensions } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { BACKEND_URL } from '../../config.js';
 
 const { width } = Dimensions.get('window');
 
@@ -32,7 +33,7 @@ const FDAScreen = ({ navigation }) => {
         setIsLoading(true);
         setError('');
         try {
-            const response = await fetch('http://10.0.0.63:5001', {
+            const response = await fetch(`${BACKEND_URL}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

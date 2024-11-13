@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Dimensions, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
+import { BACKEND_URL } from '../../config.js';
 
 const { width } = Dimensions.get('window');
 
@@ -16,7 +17,7 @@ const CDPHScreen = () => {
         setIsLoading(true);
         setError('');
         try {
-            const response = await fetch('http://10.0.0.63:5001/cdph', {
+            const response = await fetch(`${BACKEND_URL}/cdph`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

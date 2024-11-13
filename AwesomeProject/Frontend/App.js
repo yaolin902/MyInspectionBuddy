@@ -20,7 +20,7 @@ import PredictScreen from './src/screens/PredictScreen';
 import WarningLetterScreen from './src/screens/WarningLetterScreen';
 import WarningLetterResultsScreen from './src/screens/WarningLetterResultsScreen';
 import LoginScreen from './src/screens/LoginScreen'; // Import the LoginScreen
-import signUpScreen from './src/screens/signUpScreen'; // Import the SignUpScreen
+import signUpScreen from './src/screens/SignUpScreen'; // Import the SignUpScreen
 import ProtectedScreen from './src/screens/ProtectedScreen'; // Import the ProtectedScreen
 import SAPScreen from './src/screens/SAPScreen'
 

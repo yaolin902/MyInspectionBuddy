@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, Linking } from 'react-native';
+import { BACKEND_URL } from '../../config.js';
 
 const ContactFetchScreen = ({ navigation }) => {
   const [contacts, setContacts] = useState([]);
@@ -8,7 +9,7 @@ const ContactFetchScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await fetch('http://10.0.0.3:5001/contacts');
+        const response = await fetch(`${BACKEND_URL}/contacts`);
         const result = await response.json();
         setContacts(result);
         setLoading(false);

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Button, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BACKEND_URL } from '../../config.js';
 
 const ProtectedScreen = ({ navigation }) => {
   const [message, setMessage] = useState('');
@@ -16,7 +17,7 @@ const ProtectedScreen = ({ navigation }) => {
       }
 
       try {
-        const response = await axios.get('http://<your-flask-backend>/protected', {
+        const response = await axios.get(`${BACKEND_URL}/protected`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setMessage(response.data.logged_in_as.username);

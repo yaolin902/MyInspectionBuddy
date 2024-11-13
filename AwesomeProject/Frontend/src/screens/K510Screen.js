@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Dimensions } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
+import { BACKEND_URL } from '../../config.js';
 
 const { width } = Dimensions.get('window');
 
@@ -33,7 +34,7 @@ const K510Screen = () => {
         setIsLoading(true);
         setError('');
         try {
-            const response = await fetch('http://10.0.0.63:5001/k510', {
+            const response = await fetch(`${BACKEND_URL}/k510`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

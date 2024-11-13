@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+import { BACKEND_URL } from '../../config.js';
 
 const PredictScreen = () => {
   const [imageUri, setImageUri] = useState(null);
@@ -55,7 +56,7 @@ const PredictScreen = () => {
 
     try {
       console.log('Uploading image:', imageUri);
-      const response = await axios.post('http://10.0.0.3:5001/predict', formData, {
+      const response = await axios.post(`${BACKEND_URL}/predict`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

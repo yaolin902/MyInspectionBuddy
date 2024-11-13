@@ -7,13 +7,13 @@ const { width, height } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const images = [
-    require('../../assets/image1.png'),
-    require('../../assets/image2.png'),
-    require('../../assets/image3.png'),
-    require('../../assets/image4.png'),
-    require('../../assets/image5.png'),
-    require('../../assets/image6.png'),
-    require('../../assets/image7.png'),
+    // require('../../assets/image1.png'),
+    // require('../../assets/image2.png'),
+    // require('../../assets/image3.png'),
+    // require('../../assets/image4.png'),
+    // require('../../assets/image5.png'),
+    // require('../../assets/image6.png'),
+    // require('../../assets/image7.png'),
   ];
 
   const logout = async () => {

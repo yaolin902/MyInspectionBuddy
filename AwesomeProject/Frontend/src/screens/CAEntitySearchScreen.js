@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { BACKEND_URL } from '../../config.js';
 import * as Location from 'expo-location';
 
 const { width } = Dimensions.get('window');
@@ -18,7 +18,7 @@ const CAEntitySearchScreen = () => {
         };
 
         console.log(data);
-        fetch('http://10.0.0.63:5001/ca-business-entity', { // Update with your server's IP address
+        fetch(`${BACKEND_URL}/ca-business-entity`, { // Update with your server's IP address
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -56,8 +56,13 @@ const CAEntitySearchScreen = () => {
         })
         .then(reponse => reponse.json())
         .then(result => {
+            console.log(result);
             console.log(result["address"]["City"]);
-            setSearchTerm(result["address"]["City"]);
+            if (result["address"]["City"] == "") {
+                setSearchTerm(result["address"]["PlaceName"]);
+            } else {
+                setSearchTerm(result["address"]["City"]);
+            }
         });
     };
 
