@@ -23,6 +23,8 @@ import LoginScreen from './src/screens/LoginScreen'; // Import the LoginScreen
 import signUpScreen from './src/screens/SignUpScreen'; // Import the SignUpScreen
 import ProtectedScreen from './src/screens/ProtectedScreen'; // Import the ProtectedScreen
 import SAPScreen from './src/screens/SAPScreen'
+import UniversalSearchHistory from './src/screens/UniversalSearchHistory';
+import SearchHistoryService from './src/screens/SearchHistoryService';
 
 import {Alert, BackHandler} from 'react-native';
 import * as Device from 'expo-device';

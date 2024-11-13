@@ -62,62 +62,62 @@ const CAEntitySearchScreen = () => {
     };
 
     const fetchData = async () => {
-    if (!validateSearch()) return;
+        if (!validateSearch()) return;
 
-    setIsLoading(true);
-    setError('');
-    Keyboard.dismiss();
+        setIsLoading(true);
+        setError('');
+        Keyboard.dismiss();
 
-    // Store search params immediately when user searches
-    const searchParams = {
-        searchTerm: searchTerm.trim()
-    };
+        // Store search params immediately when user searches
+        const searchParams = {
+            searchTerm: searchTerm.trim()
+        };
 
-    // Save to history immediately when search is initiated
-    try {
-        await SearchHistoryService.saveSearch('CA_ENTITY', searchParams);
-    } catch (error) {
-        console.error('Error saving to history:', error);
-        // Don't block the search if history saving fails
-    }
-
-    try {
-        const response = await fetch('http://10.0.0.3:5001/ca-business-entity', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(searchParams),
-        });
-
-        const result = await response.json();
-
-        if (result.error) {
-            setError(result.error);
-            Alert.alert('Error', result.error);
-        } else {
-            if (result && result.length > 0) {
-                navigation.navigate('CAEntityResultsScreen', { results: result });
-            } else {
-                Alert.alert(
-                    'No Results',
-                    'No business entities found matching your search criteria.',
-                    [{ text: 'OK' }]
-                );
-            }
+        // Save to history immediately when search is initiated
+        try {
+            await SearchHistoryService.saveSearch('CA_ENTITY', searchParams);
+        } catch (error) {
+            console.error('Error saving to history:', error);
+            // Don't block the search if history saving fails
         }
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to connect to the server. Please try again.');
-        Alert.alert(
-            'Connection Error',
-            'Unable to reach the server. Please check your connection and try again.',
-            [{ text: 'OK' }]
-        );
-    } finally {
-        setIsLoading(false);
-    }
-};
+
+        try {
+            const response = await fetch('http://10.0.0.3:5001/ca-business-entity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(searchParams),
+            });
+
+            const result = await response.json();
+
+            if (result.error) {
+                setError(result.error);
+                Alert.alert('Error', result.error);
+            } else {
+                if (result && result.length > 0) {
+                    navigation.navigate('CAEntityResultsScreen', { results: result });
+                } else {
+                    Alert.alert(
+                        'No Results',
+                        'No business entities found matching your search criteria.',
+                        [{ text: 'OK' }]
+                    );
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setError('Failed to connect to the server. Please try again.');
+            Alert.alert(
+                'Connection Error',
+                'Unable to reach the server. Please check your connection and try again.',
+                [{ text: 'OK' }]
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <ScrollView

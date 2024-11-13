@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Dimensions, Platform } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
+import UniversalSearchHistory from './UniversalSearchHistory';
+import SearchHistoryService from './SearchHistoryService';
 import { BACKEND_URL } from '../../config.js';
 
 const { width } = Dimensions.get('window');
@@ -13,29 +14,41 @@ const CDPHScreen = () => {
     const [error, setError] = useState('');
     const navigation = useNavigation();
 
+    const handleHistorySelect = (historyItem) => {
+        setDeviceName(historyItem.deviceName);
+        setFirmName(historyItem.firmName);
+    };
+
     const handleSearch = async () => {
         setIsLoading(true);
         setError('');
+
+        const searchParams = {
+            deviceName,
+            firmName
+        };
+
         try {
             const response = await fetch(`${BACKEND_URL}/cdph`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ deviceName, firmName }),
+                body: JSON.stringify(searchParams),
             });
 
             const data = await response.json();
             if (response.ok) {
-                console.log("Results received:", data); // Log the received data
+                // Save to history
+                await SearchHistoryService.saveSearch('CDPH', searchParams);
                 navigation.navigate('CDPHResultsScreen', { results: data });
-                setIsLoading(false);
             } else {
                 throw new Error(data.message || 'Unable to fetch data');
             }
         } catch (error) {
             console.error('Error fetching data:', error);
             setError(error.message);
+        } finally {
             setIsLoading(false);
         }
     };
@@ -43,7 +56,12 @@ const CDPHScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>CDPH Device Recalls Search</Text>
-            
+
+            <UniversalSearchHistory
+                searchType="CDPH"
+                onSelectHistory={handleHistorySelect}
+            />
+
             <View style={styles.inputContainer}>
                 <Text>Device Name:</Text>
                 <TextInput
@@ -60,11 +78,11 @@ const CDPHScreen = () => {
                     onChangeText={setFirmName}
                 />
             </View>
-            
+
             <Button title="Search" onPress={handleSearch} />
-            
+
             {isLoading && <Text>Loading...</Text>}
-            {error && <Text>Error: {error}</Text>}
+            {error && <Text style={styles.errorText}>Error: {error}</Text>}
         </View>
     );
 };
@@ -91,7 +109,10 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 10,
     },
-    // Additional styles
+    errorText: {
+        color: 'red',
+        marginTop: 10,
+    }
 });
 
 export default CDPHScreen;
