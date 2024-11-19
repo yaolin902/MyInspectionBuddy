@@ -15,24 +15,18 @@ import SearchHistoryService from './SearchHistoryService';
 import { BACKEND_URL } from '../../config.js';
 import { logQuery } from './HomeScreen';
 
-const OpenHistoricalScreen = () => {
-    const [keyword, setKeyword] = useState('');
-    const [year, setYear] = useState('');
+const WarningLetterScreen = () => {
+    const [firmName, setFirmName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
 
     const handleHistorySelect = (historyItem) => {
-        setKeyword(historyItem.keyword || '');
-        setYear(historyItem.year || '');
+        setFirmName(historyItem.firmName || '');
     };
 
     const validateSearch = () => {
-        if (!keyword.trim()) {
-            Alert.alert('Validation Error', 'Please enter a keyword');
-            return false;
-        }
-        if (year && !/^\d{4}$/.test(year)) {
-            Alert.alert('Validation Error', 'Please enter a valid 4-digit year');
+        if (!firmName.trim()) {
+            Alert.alert('Validation Error', 'Please enter a firm name');
             return false;
         }
         return true;
@@ -44,17 +38,16 @@ const OpenHistoricalScreen = () => {
         setIsLoading(true);
 
         const searchParams = {
-            keyword: keyword.trim(),
-            year: year.trim()
+            firmName: firmName.trim()
         };
 
-        logQuery("OpenHistorical");
+        logQuery("WarningLetter");
 
         try {
             // Save to history immediately
-            await SearchHistoryService.saveSearch('OPEN_HISTORICAL', searchParams);
+            await SearchHistoryService.saveSearch('WARNING_LETTER', searchParams);
 
-            const response = await fetch(`${BACKEND_URL}/openhistorical`, {
+            const response = await fetch(`${BACKEND_URL}/warning_letters`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,9 +61,9 @@ const OpenHistoricalScreen = () => {
                 Alert.alert('Error', result.error);
             } else {
                 if (result && result.length > 0) {
-                    navigation.navigate('OpenHistoricalResultsScreen', { results: result });
+                    navigation.navigate('WarningLetterResultsScreen', { results: result });
                 } else {
-                    Alert.alert('No Results', 'No historical documents found for the provided criteria.');
+                    Alert.alert('No Results', 'No warning letters found for the provided criteria.');
                 }
             }
         } catch (error) {
@@ -84,30 +77,22 @@ const OpenHistoricalScreen = () => {
     return (
         <ScrollView style={styles.scrollView}>
             <View style={styles.container}>
-                <Text style={styles.title}>Open Historical Search</Text>
+                <Text style={styles.title}>FDA Warning Letter Search</Text>
 
                 <UniversalSearchHistory
-                    searchType="OPEN_HISTORICAL"
+                    searchType="WARNING_LETTER"
                     onSelectHistory={handleHistorySelect}
                 />
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Keyword: *</Text>
+                    <Text style={styles.label}>Firm Name: *</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Enter keyword"
-                        value={keyword}
-                        onChangeText={setKeyword}
-                    />
-
-                    <Text style={styles.label}>Year:</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter year (YYYY)"
-                        value={year}
-                        onChangeText={setYear}
-                        keyboardType="numeric"
-                        maxLength={4}
+                        placeholder="Enter firm name"
+                        value={firmName}
+                        onChangeText={setFirmName}
+                        returnKeyType="search"
+                        onSubmitEditing={fetchData}
                     />
                 </View>
 
@@ -161,7 +146,6 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: '#fff',
         fontSize: 16,
-        marginBottom: 15,
     },
     searchButton: {
         backgroundColor: '#007AFF',
@@ -187,4 +171,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default OpenHistoricalScreen;
+export default WarningLetterScreen;
