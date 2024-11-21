@@ -285,7 +285,7 @@ def manage_licenses():
     licenses = License.query.all()
     if not licenses:
         logging.info("No license found in the database.")
-    return jsonify([license.to_dict() for license in licenses])
+    return jsonify([license.to_json() for license in licenses])
 
 
 @app.route("/license-search", methods=["GET"])
@@ -301,7 +301,7 @@ def search_licenses():
     licenses = query.all()
     if not licenses:
         logging.info("No license found in the database.")
-    return jsonify([license.to_dict() for license in licenses])
+    return jsonify([license.to_json() for license in licenses])
 
 
 # Define a route for the root URL that accepts POST requests
