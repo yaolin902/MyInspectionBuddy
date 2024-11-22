@@ -288,18 +288,18 @@ def manage_licenses():
     return jsonify([license.to_json() for license in licenses])
 
 
-@app.route("/license-search", methods=["GET"])
+@app.route("/license-search", methods=["POST"])
 def search_licenses():
-    business_name = request.args.get('businessName')
-    license_code_description = request.args.get('licenseCodeDescription')
-    license_status_code = request.args.get('licenseStatusCode')
-    license_address_type_description = request.args.get('licenseAddressTypeDescription')
-    address_line1 = request.args.get('addressLine1')
-    city = request.args.get('city')
-    state = request.args.get('state')
-    zip_code = request.args.get('zip')
-    county_code = request.args.get('countyCode')
-    expiration_date = request.args.get('expirationDate')
+    business_name = request.get_json().get('businessName')
+    license_code_description = request.get_json().get('licenseCodeDescription')
+    license_status_code = request.get_json().get('licenseStatusCode')
+    license_address_type_description = request.get_json().get('licenseAddressTypeDescription')
+    address_line1 = request.get_json().get('addressLine1')
+    city = request.get_json().get('city')
+    state = request.get_json().get('state')
+    zip_code = request.get_json().get('zip')
+    county_code = request.get_json().get('countyCode')
+    expiration_date = request.get_json().get('expirationDate')
 
     # Query the database and apply filtering dynamically using SQLAlchemy
     query = Contact.query
