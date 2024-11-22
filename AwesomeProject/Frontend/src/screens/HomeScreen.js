@@ -7,13 +7,13 @@ const { width, height } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const images = [
-    // require('../../assets/image1.png'),
-    // require('../../assets/image2.png'),
-    // require('../../assets/image3.png'),
-    // require('../../assets/image4.png'),
-    // require('../../assets/image5.png'),
-    // require('../../assets/image6.png'),
-    // require('../../assets/image7.png'),
+    require('../../assets/image1.png'),
+    require('../../assets/image2.png'),
+    require('../../assets/image3.png'),
+    require('../../assets/image4.png'),
+    require('../../assets/image5.png'),
+    require('../../assets/image6.png'),
+    require('../../assets/image.png'),
   ];
 
   const logout = async () => {
@@ -74,9 +74,14 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={[styles.button, styles.button9]} onPress={() => navigation.navigate('SAPScreen')}>
-          <Text style={styles.buttonText}>SAP Travel Info</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={[styles.button, styles.button9]} onPress={() => navigation.navigate('SAPScreen')}>
+            <Text style={styles.buttonText}>SAP Travel Info</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.button1]} onPress={() => navigation.navigate('License')}>
+            <Text style={styles.buttonText}>License Search</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <TouchableOpacity style={styles.bottomButton} onPress={() => navigation.navigate('PredictScreen')}>

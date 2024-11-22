@@ -22,7 +22,9 @@ import WarningLetterResultsScreen from './src/screens/WarningLetterResultsScreen
 import LoginScreen from './src/screens/LoginScreen'; // Import the LoginScreen
 import signUpScreen from './src/screens/SignUpScreen'; // Import the SignUpScreen
 import ProtectedScreen from './src/screens/ProtectedScreen'; // Import the ProtectedScreen
-import SAPScreen from './src/screens/SAPScreen'
+import SAPScreen from './src/screens/SAPScreen';
+import LicenseScreen from './src/screens/LicenseScreen';
+import LicenseResultsScreen from './src/screens/LicenseResultsScreen';
 import UniversalSearchHistory from './src/screens/UniversalSearchHistory';
 import SearchHistoryService from './src/screens/SearchHistoryService';
 
@@ -98,6 +100,8 @@ export default function App() {
         <Stack.Screen name="WarningLetterScreen" component={WarningLetterScreen} />
         <Stack.Screen name="WarningLetterResultsScreen" component={WarningLetterResultsScreen} />
         <Stack.Screen name="SAPScreen" component={SAPScreen} />
+        <Stack.Screen name="License" component={LicenseScreen} />
+        <Stack.Screen name="LicenseResult" component={LicenseResultsScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

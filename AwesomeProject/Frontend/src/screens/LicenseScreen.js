@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Dimensions } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { BACKEND_URL } from '../../config.js';
 
 const { width } = Dimensions.get('window');
 
@@ -37,7 +38,7 @@ const LicenseScreen = ({ navigation }) => {
         setIsLoading(true);
         setError('');
         try {
-            const response = await fetch('http://127.0.0.1:5000/search', {
+            const response = await fetch(`${BACKEND_URL}/license-search`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -64,7 +65,7 @@ const LicenseScreen = ({ navigation }) => {
             console.log('Response Data:', data);
 
             if (response.ok) {
-                navigation.navigate('LicenseResultsScreen', { results: data.contacts || [] });
+                navigation.navigate('LicenseResult', { results: data || [] });
                 setIsLoading(false);
             } else {
                 throw new Error(data.message || 'Unable to fetch data');
