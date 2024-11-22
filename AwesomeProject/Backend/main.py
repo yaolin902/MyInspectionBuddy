@@ -88,6 +88,75 @@ class Contact(db.Model):
             'link_to_website': self.link_to_website
         }
 
+# licenses
+class License(db.Model):
+    license_address_id = db.Column(db.Integer, primary_key=True) # specify type of field
+    license_id = db.Column(db.Integer) # unique
+    license_number = db.Column(db.Integer) # unique
+    license_code_description = db.Column(db.String(10), unique=True, nullable=True)
+    application_form_type_id = db.Column(db.Integer)
+    license_type_id = db.Column(db.Integer)
+    license_type_code = db.Column(db.String(2), unique=True, nullable=True)
+    license_status_id = db.Column(db.Integer)
+    license_status_code = db.Column(db.String(2), unique=True, nullable=True) # String
+    license_classification_id = db.Column(db.Integer) # edited (db.Datetime, nullable=True, default=datetime.now)
+    license_classification_code = db.Column(db.String(80), unique=False, nullable=True) 
+    license_classification_description = db.Column(db.String(80), unique=False, nullable=True) 
+    expiration_date = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
+    firm_id = db.Column(db.Integer) # unique
+    corporate_name = db.Column(db.String(80), unique=False, nullable=True)
+    business_name = db.Column(db.String(80), unique=False, nullable=True)
+    doing_business_as = db.Column(db.String(80), unique=False, nullable=True)
+    state_incorporation = db.Column(db.String(80), unique=False, nullable=True)
+    address_line_1 = db.Column(db.String(80), unique=True, nullable=True) # unique
+    address_line_2 = db.Column(db.String(80), unique=False, nullable=True) 
+    city = db.Column(db.String(80), unique=False, nullable=True) 
+    state = db.Column(db.String(80), unique=False, nullable=True) 
+    zip = db.Column(db.String(80), unique=False, nullable=True) 
+    county_id = db.Column(db.Integer)
+    county_code = db.Column(db.String(80), unique=False, nullable=True) 
+    license_address_type_id = db.Column(db.Integer)
+    license_address_type_code = db.Column(db.String(80), unique=False, nullable=True) 
+    license_address_type_description = db.Column(db.String(80), unique=False, nullable=True) 
+    exemptee_last_name = db.Column(db.String(80), unique=False, nullable=True) 
+    exemptee_first_name = db.Column(db.String(80), unique=False, nullable=True)
+ 
+
+
+    def to_json(self):
+        return {
+            "licenseAddressId": self.license_address_id,
+            "licenseId": self.license_id,
+            "licenseNumber": self.license_number,
+            "licenseCodeDescription": self.license_code_description,
+            "applicationFormTypeId": self.application_form_type_id,
+            "licenseTypeId": self.license_type_id,
+            "licenseTypeCode": self.license_type_code,
+            "licenseStatusId": self.license_status_id,
+            "licenseStatusCode # String": self.license_status_code,
+            "licenseClassificationId": self.license_classification_id,
+            "licenseClassificationCode": self.license_classification_code,
+            "licenseClassificationDescription": self.license_classification_description,
+            "expirationDate": self.expiration_date,
+            "firmId": self.firm_id,
+            "corporateName": self.corporate_name,
+            "businessName": self.business_name,
+            "doingBusinessAs": self.doing_business_as,
+            "stateIncorporation": self.state_incorporation,
+            "addressLine1": self.address_line_1,
+            "addressLine2": self.address_line_2,
+            "city": self.city,
+            "state": self.state,
+            "zip": self.zip,
+            "countyId": self.county_id,
+            "countyCode": self.county_code,
+            "licenseAddressTypeId": self.license_address_type_id,
+            "licenseAddressTypeCode": self.license_address_type_code,
+            "licenseAddressTypeDescription": self.license_address_type_description,
+            "exempteeLastName": self.exemptee_last_name,
+            "exempteeFirstName": self.exemptee_first_name
+        }
+
 # Initialize the database
 with app.app_context():
     db.create_all()
@@ -108,6 +177,47 @@ with app.app_context():
                 db.session.add(new_contact)
             db.session.commit()
         logging.info("Database populated with initial data from info.csv")
+
+    if not License.query.first():
+        with open('license.csv', mode='r', newline='') as file:
+            csv_reader = csv.reader(file)
+            next(csv_reader)  # Skip header
+            for row in csv_reader:
+                new_contact = License(
+                    license_address_id=int(row[0]),
+                    license_id=int(row[1]),
+                    license_number=int(row[2]),
+                    license_code_description=row[3],
+                    application_form_type_id=int(row[4]),
+                    license_type_id=int(row[5]),
+                    license_type_code=row[6],
+                    license_status_id=int(row[7]),
+                    license_status_code=row[8],
+                    license_classification_id=int(row[9]),
+                    license_classification_code=row[10],
+                    license_classification_description=row[11],
+                    expiration_date=datetime.strptime(row[12], '%Y-%m-%d'),
+                    firm_id=int(row[13]),
+                    corporate_name=row[14],
+                    business_name=row[15],
+                    doing_business_as=row[16],
+                    state_incorporation=row[17],
+                    address_line_1=row[18],
+                    address_line_2=row[19],
+                    city=row[20],
+                    state=row[21],
+                    zip=row[22],
+                    county_id=int(row[23]),
+                    county_code=row[24],
+                    license_address_type_id=int(row[25]),
+                    license_address_type_code=row[26],
+                    license_address_type_description=row[27],
+                    exemptee_last_name=row[28],
+                    exemptee_first_name=row[29]
+                )
+                db.session.add(new_contact)
+            db.session.commit()
+        logging.info("Database populated with initial data from license.csv")
 
 # User registration route
 @app.route('/register', methods=['POST'])
@@ -169,6 +279,59 @@ def manage_contacts():
         db.session.add(new_contact)
         db.session.commit()
         return jsonify(new_contact.to_dict()), 201
+
+@app.route("/licenses", methods=['GET'])
+def manage_licenses():
+    licenses = License.query.all()
+    if not licenses:
+        logging.info("No license found in the database.")
+    return jsonify([license.to_json() for license in licenses])
+
+
+@app.route("/license-search", methods=["POST"])
+def search_licenses():
+    business_name = request.get_json().get('businessName')
+    license_code_description = request.get_json().get('licenseCodeDescription')
+    license_status_code = request.get_json().get('licenseStatusCode')
+    license_address_type_description = request.get_json().get('licenseAddressTypeDescription')
+    address_line1 = request.get_json().get('addressLine1')
+    city = request.get_json().get('city')
+    state = request.get_json().get('state')
+    zip_code = request.get_json().get('zip')
+    county_code = request.get_json().get('countyCode')
+    expiration_date = request.get_json().get('expirationDate')
+
+    # Query the database and apply filtering dynamically using SQLAlchemy
+    query = License.query
+    
+    # Apply filters dynamically only if the parameter exists
+    if business_name:
+        query = query.filter(License.businessName == business_name)
+    if license_code_description:
+        query = query.filter(License.licenseCodeDescription == license_code_description)
+    if license_status_code:
+        query = query.filter(License.licenseStatusCode == license_status_code)
+    if license_address_type_description:
+        query = query.filter(License.licenseAddressTypeDescription == license_address_type_description)
+    if address_line1:
+        query = query.filter(License.addressLine1 == address_line1)
+    if city:
+        query = query.filter(License.city == city)
+    if state:
+        query = query.filter(License.state == state)
+    if zip_code:
+        query = query.filter(License.zip == zip_code)
+    if county_code:
+        query = query.filter(License.countyCode == county_code)
+    if expiration_date:
+        query = query.filter(License.expirationDate == expiration_date)
+
+    # Execute the query and get all matching contacts
+    licenses = query.all()
+    if not licenses:
+        logging.info("No license found in the database.")
+    return jsonify([license.to_json() for license in licenses])
+
 
 # Define a route for the root URL that accepts POST requests
 @app.route("/", methods=['POST'])
