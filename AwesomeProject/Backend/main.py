@@ -302,29 +302,29 @@ def search_licenses():
     expiration_date = request.get_json().get('expirationDate')
 
     # Query the database and apply filtering dynamically using SQLAlchemy
-    query = Contact.query
+    query = License.query
     
     # Apply filters dynamically only if the parameter exists
     if business_name:
-        query = query.filter(Contact.businessName == business_name)
+        query = query.filter(License.businessName == business_name)
     if license_code_description:
-        query = query.filter(Contact.licenseCodeDescription == license_code_description)
+        query = query.filter(License.licenseCodeDescription == license_code_description)
     if license_status_code:
-        query = query.filter(Contact.licenseStatusCode == license_status_code)
+        query = query.filter(License.licenseStatusCode == license_status_code)
     if license_address_type_description:
-        query = query.filter(Contact.licenseAddressTypeDescription == license_address_type_description)
+        query = query.filter(License.licenseAddressTypeDescription == license_address_type_description)
     if address_line1:
-        query = query.filter(Contact.addressLine1 == address_line1)
+        query = query.filter(License.addressLine1 == address_line1)
     if city:
-        query = query.filter(Contact.city == city)
+        query = query.filter(License.city == city)
     if state:
-        query = query.filter(Contact.state == state)
+        query = query.filter(License.state == state)
     if zip_code:
-        query = query.filter(Contact.zip == zip_code)
+        query = query.filter(License.zip == zip_code)
     if county_code:
-        query = query.filter(Contact.countyCode == county_code)
+        query = query.filter(License.countyCode == county_code)
     if expiration_date:
-        query = query.filter(Contact.expirationDate == expiration_date)
+        query = query.filter(License.expirationDate == expiration_date)
 
     # Execute the query and get all matching contacts
     licenses = query.all()
