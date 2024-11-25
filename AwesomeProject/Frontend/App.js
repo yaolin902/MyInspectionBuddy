@@ -26,6 +26,8 @@ import SAPScreen from './src/screens/SAPScreen'
 import UniversalSearchHistory from './src/screens/UniversalSearchHistory';
 import SearchHistoryService from './src/screens/SearchHistoryService';
 import PrivacyScreen from './src/screens/PrivacyScreen';
+import LicenseScreen from './src/screens/LicenseScreen';
+import LicenseResultsScreen from './src/screens/LicenseResultsScreen';
 
 import {Alert, BackHandler} from 'react-native';
 import * as Device from 'expo-device';
@@ -100,6 +102,8 @@ export default function App() {
         <Stack.Screen name="WarningLetterResultsScreen" component={WarningLetterResultsScreen} />
         <Stack.Screen name="SAPScreen" component={SAPScreen} />
         <Stack.Screen name="PrivacyScreen" component={PrivacyScreen} />
+        <Stack.Screen name="License" component={LicenseScreen} />
+        <Stack.Screen name="LicenseResult" component={LicenseResultsScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

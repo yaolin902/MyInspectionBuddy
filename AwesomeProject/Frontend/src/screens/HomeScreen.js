@@ -6,7 +6,7 @@ import analytics from '@react-native-firebase/analytics';
 
 const { width, height } = Dimensions.get('window');
 
-const logNavigation = async (screen) => {
+export const logNavigation = async (screen) => {
   try {
     const savedValue = await AsyncStorage.getItem('dataCollectionEnabled');
     if (savedValue == "true")
@@ -16,7 +16,7 @@ const logNavigation = async (screen) => {
   }
 }
 
-const logQuery = async (screen) => {
+export const logQuery = async (screen) => {
   try {
     const savedValue = await AsyncStorage.getItem('dataCollectionEnabled');
     if (savedValue == "true")
@@ -95,12 +95,17 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={[styles.button, styles.button9]} onPress={() => {logNavigation("SAPScreen"); navigation.navigate('SAPScreen')}}>
-          <Text style={styles.buttonText}>SAP Travel Info</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.button10]} onPress={() => {logNavigation("PrivacyScreen"); navigation.navigate('PrivacyScreen')}}>
-          <Text style={styles.buttonText}>Privacy Policy</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={[styles.button, styles.button9]} onPress={() => {logNavigation("SAPScreen"); navigation.navigate('SAPScreen')}}>
+            <Text style={styles.buttonText}>SAP Travel Info</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.button10]} onPress={() => {logNavigation("LicenseScreen"); navigation.navigate('License')}}>
+            <Text style={styles.buttonText}>License Search</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.button11]} onPress={() => {logNavigation("PrivacyScreen"); navigation.navigate('PrivacyScreen')}}>
+            <Text style={styles.buttonText}>Privacy Policy</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <TouchableOpacity style={styles.bottomButton} onPress={() => {logNavigation("PredictScreen"); navigation.navigate('PredictScreen')}}>
@@ -194,6 +199,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFCCBC',
   },
   button10: {
+    backgroundColor: '#BA721A',
+  },
+  button11: {
     backgroundColor: '#C2C3C4',
   },
   buttonText: {
