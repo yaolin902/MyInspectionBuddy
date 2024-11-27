@@ -40,6 +40,7 @@ jwt = JWTManager(app)
 # set up upload config
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
+app.config["SECRET_KEY"] = 'super secret key'
 
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO)
@@ -659,7 +660,7 @@ def search_ca_business_entity():
 
         # Parse the search page to get the necessary form data and cookies
         json_data = {
-            'SEARCH_VALUE': 'test',
+            'SEARCH_VALUE': search_term,
             'SEARCH_TYPE_ID': '1',
         }
         headers = {
@@ -746,10 +747,10 @@ def upload_file():
             # parsing results, looking for object name
             results = search.as_dict()
 
-            if "search_information" in results:
-                results = results["search_information"]["query_displayed"]
-            else:
-                results = "object not recognized"
+            # if "search_information" in results:
+            #     results = results["search_information"]["query_displayed"]
+            # else:
+            #     results = "object not recognized"
 
             # automatically remove files 3 days old
             for f in os.listdir(UPLOAD_FOLDER):
@@ -791,7 +792,7 @@ def predict():
 
         results = model.predict(source=image_np, save=True)
 
-        result_image_path = "runs/detect/predict7/result.png"
+        result_image_path = "/app/runs/detect/predict/image0.jpg"
         cv2.imwrite(result_image_path, results[0].plot())
 
         with open(result_image_path, "rb") as image_file:
