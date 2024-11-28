@@ -311,6 +311,92 @@ def search_ca_business_entity():
     except requests.RequestException as e:
         logging.error(f"Error fetching data from CA Secretary of State business search: {e}")
         return jsonify({"error": "Failed to fetch data from the website", "details": str(e)}), 500
+    
+@app.route('/chat', methods=['POST'])
+def chat_with_rasa_and_confluence():
+    """
+    Handles user messages by determining if it's a Confluence query
+    or should be forwarded to RASA.
+    """
+    data = request.get_json()
+    message = data.get('message', '').lower()
+
+    if not message:
+        return jsonify({"error": "Message is required"}), 400
+
+    # Pre-defined map of Confluence-related keywords to page IDs
+    content_map = {
+        "product requirements": "30507017",
+        "masvs checklist": "41353217",
+        "privacy": "29655042",
+        "build .ipa": "33325058",
+        "unit testing": "56262659",
+        "samd": "29032449",
+        "pytorch": "28835843",
+        "hardware considerations": "27131907",
+        "mysql database": "60391427",
+        "mysql backend": "59834369",
+        "flask api": "74088449"
+    }
+
+    # Check if the message matches any Confluence keyword
+    for keyword, page_id in content_map.items():
+        if keyword in message:
+            # Fetch the content from Confluence
+            confluence_base_url = os.getenv('CONFLUENCE_BASE_URL')
+            confluence_api_token = os.getenv('CONFLUENCE_API_TOKEN')
+            confluence_email = os.getenv('CONFLUENCE_EMAIL')
+
+            if not all([confluence_base_url, confluence_api_token, confluence_email]):
+                return jsonify({"reply": "There is an issue with the server configuration. Please try again later."}), 500
+
+            # Create Basic Auth header
+            auth_string = f"{confluence_email}:{confluence_api_token}"
+            auth_bytes = base64.b64encode(auth_string.encode('utf-8')).decode('utf-8')
+
+            headers = {
+                'Authorization': f'Basic {auth_bytes}',
+                'Content-Type': 'application/json'
+            }
+
+            # URL to fetch page content by ID
+            url = f"{confluence_base_url}/wiki/rest/api/content/{page_id}?expand=body.storage"
+
+            try:
+                response = requests.get(url, headers=headers)
+                response.raise_for_status()
+                data = response.json()
+
+                # Extract the HTML content of the page
+                page_content = data.get('body', {}).get('storage', {}).get('value', 'No content available')
+                return jsonify({"reply": page_content}), 200
+
+            except requests.RequestException as e:
+                logging.error(f"Error fetching data from Confluence: {e}")
+                return jsonify({"reply": "I'm having trouble accessing the information at the moment. Please try again later."}), 500
+
+    # If no Confluence-related keyword is matched, forward the message to RASA
+    rasa_url = "http://localhost:5005/webhooks/rest/webhook"  # RASA REST API endpoint
+
+    try:
+        # Send the user message to RASA
+        response = requests.post(rasa_url, json={"sender": "user", "message": message})
+        response.raise_for_status()
+
+        # Parse the response from RASA
+        bot_responses = response.json()
+        if bot_responses:
+            # Combine responses if RASA sends multiple messages
+            reply_text = " ".join([resp.get("text", "") for resp in bot_responses])
+        else:
+            reply_text = "I'm not sure how to respond to that."
+
+        return jsonify({"reply": reply_text}), 200
+
+    except requests.RequestException as e:
+        logging.error(f"Error communicating with RASA: {e}")
+        return jsonify({"reply": "Failed to communicate with the bot. Please try again later."}), 500
+
 
 # Run the Flask app on the specified host and port
 if __name__ == "__main__":
