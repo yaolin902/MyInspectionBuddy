@@ -40,7 +40,7 @@ jwt = JWTManager(app)
 # set up upload config
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
-app.config["SECRET_KEY"] = 'super secret key'
+app.config["SECRET_KEY"] = os.getenv('APP_SECRET_KEY')
 
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO)
