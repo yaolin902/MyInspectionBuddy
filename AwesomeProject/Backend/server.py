@@ -222,21 +222,90 @@ def search_openhistorical():
     data = request.get_json()
     logging.info(f"OpenHistorical request data: {data}")
 
-    keyword = data.get('keyword', '')
-    year = data.get('year', '')
+    keyword = data.get("keyword", "")
+    year = data.get("year", "")
 
     if not keyword:
         return jsonify({"error": "Keyword is required"}), 400
+
+    # Construct the query parameters
+    query_params = {}
+    if year:
+        query_params.update(
+            {
+                "query": {"term": {"year": year}},
+            }
+        )
+    if keyword:
+        query_params.update(
+            {
+                "query": {
+                    "match": {
+                        "text": {
+                            "query": keyword,
+                            "boost": 0.5
+                        }
+                    }
+                },
+                "knn": {
+                    "field": "text_embedding.predicted_value",
+                    "query_vector_builder": {
+                        "text_embedding": {
+                            "model_id": "sentence-transformers__msmarco-minilm-l12-cos-v5",
+                            "model_text": keyword,
+                        }
+                    },
+                    "k": 10,
+                    "num_candidates": 100,
+                    "boost": 0.2
+                },
+                "fields": ["id", "text", "num_of_pages", "year", "doc_type"],
+                "_source": False,
+                "size": 25
+            }
+        )
+
+    url = "http://localhost:9200/document-with-vector/_search"
+
+    try:
+        logging.info(f"Sending request to FDA OpenHistorical API: {url}")
+        response = requests.get(
+            url, json=query_params, headers={"Content-Type": "application/json"}
+        )
+        response.raise_for_status()
+
+        response_data = response.json()
+
+        # Ensure we correctly handle the API response structure
+        hits = response_data.get("hits", {}).get("hits", [])
+        results = [
+            {
+                "num_of_pages": document.get("fields").get("num_of_pages", "N/A")[0],
+                "year": document.get("fields").get("year", "N/A")[0],
+                "text": document.get("fields").get("text", "N/A")[0],
+                "doc_type": document.get("fields").get("doc_type", "N/A")[0],
+            }
+            for document in hits
+        ]
+
+        return jsonify(results)
+    except requests.RequestException as e:
+        logging.error(f"Error fetching data from FDA OpenHistorical API: {e}")
+        pass
 
     # Construct the query parameters
     query_params = []
     if keyword:
         query_params.append(f'text:"{keyword}"')
     if year:
-        query_params.append(f'year:{year}')
+        query_params.append(f"year:{year}")
 
-    query_string = ' AND '.join(query_params)
-    url = f"https://api.fda.gov/other/historicaldocument.json?api_key=e3oka6wF312QcwuJguDeXVEN6XGyeJC94Hirijj8&search={query_string}&limit=100"
+    apikey = os.getenv('FDA_API_KEY')
+    if not apikey:
+        return jsonify({"error": "API key is missing"}), 500
+
+    query_string = " AND ".join(query_params)
+    url = f"https://api.fda.gov/other/historicaldocument.json?api_key={apikey}&search={query_string}&limit=100"
 
     try:
         logging.info(f"Sending request to FDA OpenHistorical API: {url}")
@@ -246,17 +315,23 @@ def search_openhistorical():
         response_data = response.json()
 
         # Ensure we correctly handle the API response structure
-        results = [{
-            "num_of_pages": document.get('num_of_pages', 'N/A'),
-            "year": document.get('year', 'N/A'),
-            "text": document.get('text', 'N/A'),
-            "doc_type": document.get('doc_type', 'N/A')
-        } for document in response_data.get('results', [])]
+        results = [
+            {
+                "num_of_pages": document.get("num_of_pages", "N/A"),
+                "year": document.get("year", "N/A"),
+                "text": document.get("text", "N/A"),
+                "doc_type": document.get("doc_type", "N/A"),
+            }
+            for document in response_data.get("results", [])
+        ]
 
         return jsonify(results)
     except requests.RequestException as e:
         logging.error(f"Error fetching data from FDA OpenHistorical API: {e}")
-        return jsonify({"error": "Failed to fetch data from the API", "details": str(e)}), 500
+        return (
+            jsonify({"error": "Failed to fetch data from the API", "details": str(e)}),
+            500,
+        )
 
 # Define a new route for CA business entity keyword search
 @app.route("/ca-business-entity", methods=['POST'])
