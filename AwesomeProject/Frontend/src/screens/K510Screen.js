@@ -17,7 +17,6 @@ import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
 import SearchHistoryService from './SearchHistoryService';
 import { BACKEND_URL } from '../../config.js';
-import { logQuery } from './HomeScreen';
 
 const K510Screen = () => {
     const [k510Number, setK510Number] = useState('');
@@ -148,8 +147,6 @@ const K510Screen = () => {
             fromDate: fromDate.toISOString().split('T')[0],
             toDate: toDate.toISOString().split('T')[0],
         };
-
-        logQuery("K510");
 
         try {
             await SearchHistoryService.saveSearch('K510', searchParams);

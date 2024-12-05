@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, ActivityIndicator, Ale
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { BACKEND_URL } from '../../config.js';
-import { logQuery } from './HomeScreen';
 
 const PredictScreen = () => {
   const [imageUri, setImageUri] = useState(null);
@@ -54,8 +53,6 @@ const PredictScreen = () => {
       type: 'image/png', // Ensure this matches the selected image type
       name: 'image.png', // Adjust based on the actual image type
     });
-
-    logQuery("PredictImage");
 
     try {
       console.log('Uploading image:', imageUri);

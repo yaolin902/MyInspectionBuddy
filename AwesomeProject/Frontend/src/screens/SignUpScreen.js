@@ -3,7 +3,6 @@ import { View, TextInput, Button, Text, TouchableOpacity, StyleSheet, Image } fr
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '../../config.js';
-import { logQuery } from './HomeScreen';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -11,7 +10,6 @@ const LoginScreen = ({ navigation }) => {
   const [message, setMessage] = useState('');
 
   const login = async () => {
-    logQuery("UserSignUp");
     try {
       const response = await axios.post(`${BACKEND_URL}/login`, { username, password });
       await AsyncStorage.setItem('access_token', response.data.access_token);

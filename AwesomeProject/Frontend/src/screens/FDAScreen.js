@@ -14,7 +14,6 @@ import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
 import SearchHistoryService from './SearchHistoryService';
 import { BACKEND_URL } from '../../config.js';
-import { logQuery } from './HomeScreen';
 
 const FDAScreen = () => {
     const [fromDate, setFromDate] = useState(new Date());
@@ -69,8 +68,6 @@ const FDAScreen = () => {
             fromDate: fromDate.toISOString().split('T')[0],
             toDate: toDate.toISOString().split('T')[0],
         };
-
-        logQuery("FDA");
 
         try {
             // Save search history immediately

@@ -16,7 +16,6 @@ import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
 import SearchHistoryService from './SearchHistoryService';
 import { BACKEND_URL } from '../../config.js';
-import { logQuery } from './HomeScreen';
 
 const MaudeScreen = () => {
     const [deviceName, setDeviceName] = useState('');
@@ -67,8 +66,6 @@ const MaudeScreen = () => {
             fromDate: fromDate.toISOString().split('T')[0],
             toDate: toDate.toISOString().split('T')[0],
         };
-
-        logQuery("Maude");
 
         try {
             // Save to history immediately when search is initiated

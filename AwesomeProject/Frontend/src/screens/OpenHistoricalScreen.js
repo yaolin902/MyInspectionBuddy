@@ -13,7 +13,6 @@ import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
 import SearchHistoryService from './SearchHistoryService';
 import { BACKEND_URL } from '../../config.js';
-import { logQuery } from './HomeScreen';
 
 const OpenHistoricalScreen = () => {
     const [keyword, setKeyword] = useState('');
@@ -47,8 +46,6 @@ const OpenHistoricalScreen = () => {
             keyword: keyword.trim(),
             year: year.trim()
         };
-
-        logQuery("OpenHistorical");
 
         try {
             // Save to history immediately

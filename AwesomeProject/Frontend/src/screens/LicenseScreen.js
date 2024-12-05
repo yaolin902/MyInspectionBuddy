@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, Dimensions } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { BACKEND_URL } from '../../config.js';
-import { logQuery } from './HomeScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -38,8 +37,6 @@ const LicenseScreen = ({ navigation }) => {
     const handleSearch = async () => {
         setIsLoading(true);
         setError('');
-        logQuery("LicenseSearch")
-
         try {
             const response = await fetch(`${BACKEND_URL}/license-search`, {
                 method: 'POST',

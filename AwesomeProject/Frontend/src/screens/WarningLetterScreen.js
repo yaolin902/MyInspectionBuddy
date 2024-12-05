@@ -13,7 +13,6 @@ import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
 import SearchHistoryService from './SearchHistoryService';
 import { BACKEND_URL } from '../../config.js';
-import { logQuery } from './HomeScreen';
 
 const WarningLetterScreen = () => {
     const [firmName, setFirmName] = useState('');
@@ -40,8 +39,6 @@ const WarningLetterScreen = () => {
         const searchParams = {
             firmName: firmName.trim()
         };
-
-        logQuery("WarningLetter");
 
         try {
             // Save to history immediately

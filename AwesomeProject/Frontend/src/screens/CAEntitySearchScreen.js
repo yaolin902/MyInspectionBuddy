@@ -19,7 +19,6 @@ import SearchHistoryService from './SearchHistoryService';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BACKEND_URL } from '../../config.js';
 import * as Location from 'expo-location';
-import { logQuery } from './HomeScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -80,8 +79,6 @@ const CAEntitySearchScreen = () => {
             searchTerm: searchTerm.trim()
         };
 
-        logQuery("CAEntitySearch");
-
         // Save to history immediately when search is initiated
         try {
             await SearchHistoryService.saveSearch('CA_ENTITY', searchParams);
@@ -91,6 +88,7 @@ const CAEntitySearchScreen = () => {
         }
 
         try {
+            console.log(`${BACKEND_URL}/ca-business-entity`);
             const response = await fetch(`${BACKEND_URL}/ca-business-entity`, {
                 method: 'POST',
                 headers: {

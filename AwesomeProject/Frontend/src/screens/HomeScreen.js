@@ -2,29 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, Button } from 'react-native';
 import Swiper from 'react-native-swiper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import analytics from '@react-native-firebase/analytics';
 
 const { width, height } = Dimensions.get('window');
-
-export const logNavigation = async (screen) => {
-  try {
-    const savedValue = await AsyncStorage.getItem('dataCollectionEnabled');
-    if (savedValue == "true")
-      await analytics().logEvent('userNavigation' + screen);
-  } catch(e) {
-    console.error(e);
-  }
-}
-
-export const logQuery = async (screen) => {
-  try {
-    const savedValue = await AsyncStorage.getItem('dataCollectionEnabled');
-    if (savedValue == "true")
-      await analytics().logEvent('userQuery' + screen);
-  } catch(e) {
-    console.error(e);
-  }
-}
 
 const HomeScreen = ({ navigation }) => {
   const images = [
@@ -66,49 +45,46 @@ const HomeScreen = ({ navigation }) => {
 
       <View style={styles.buttonContainer}>
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.button, styles.button1]} onPress={() => {logNavigation("FDA"); navigation.navigate('FDA')}}>
+          <TouchableOpacity style={[styles.button, styles.button1]} onPress={() => navigation.navigate('FDA')}>
             <Text style={styles.buttonText}>FDA Enforcement</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button2]} onPress={() => {logNavigation("K510"); navigation.navigate('K510')}}>
+          <TouchableOpacity style={[styles.button, styles.button2]} onPress={() => navigation.navigate('K510')}>
             <Text style={styles.buttonText}>510k</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button3]} onPress={() => {logNavigation("Maude"); navigation.navigate('Maude')}}>
+          <TouchableOpacity style={[styles.button, styles.button3]} onPress={() => navigation.navigate('Maude')}>
             <Text style={styles.buttonText}>MAUDE</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button4]} onPress={() => {logNavigation("CDPH"); navigation.navigate('CDPH')}}>
+          <TouchableOpacity style={[styles.button, styles.button4]} onPress={() => navigation.navigate('CDPH')}>
             <Text style={styles.buttonText}>CDPH Medical Device Page</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.button, styles.button5]} onPress={() => {logNavigation("OpenHistoricalScreen"); navigation.navigate('OpenHistoricalScreen')}}>
+          <TouchableOpacity style={[styles.button, styles.button5]} onPress={() => navigation.navigate('OpenHistoricalScreen')}>
             <Text style={styles.buttonText}>Historical Documents</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button6]} onPress={() => {logNavigation("WarningLetter"); navigation.navigate('WarningLetter')}}>
+          <TouchableOpacity style={[styles.button, styles.button6]} onPress={() => navigation.navigate('WarningLetterScreen')}>
             <Text style={styles.buttonText}>FDA Warning Letter Database</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button7]} onPress={() => {logNavigation("CAEntitySearchScreen"); navigation.navigate('CAEntitySearchScreen')}}>
+          <TouchableOpacity style={[styles.button, styles.button7]} onPress={() => navigation.navigate('CAEntitySearchScreen')}>
             <Text style={styles.buttonText}>CA Business Entity Search</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button8]} onPress={() => {logNavigation("ContactFetchScreen"); navigation.navigate('ContactFetchScreen')}}>
+          <TouchableOpacity style={[styles.button, styles.button8]} onPress={() => navigation.navigate('ContactFetchScreen')}>
             <Text style={styles.buttonText}>DA Office Contacts</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.button, styles.button9]} onPress={() => {logNavigation("SAPScreen"); navigation.navigate('SAPScreen')}}>
+          <TouchableOpacity style={[styles.button, styles.button9]} onPress={() => navigation.navigate('SAPScreen')}>
             <Text style={styles.buttonText}>SAP Travel Info</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button10]} onPress={() => {logNavigation("LicenseScreen"); navigation.navigate('License')}}>
+          <TouchableOpacity style={[styles.button, styles.button1]} onPress={() => navigation.navigate('License')}>
             <Text style={styles.buttonText}>License Search</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.button11]} onPress={() => {logNavigation("PrivacyScreen"); navigation.navigate('PrivacyScreen')}}>
-            <Text style={styles.buttonText}>Privacy Policy</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <TouchableOpacity style={styles.bottomButton} onPress={() => {logNavigation("PredictScreen"); navigation.navigate('PredictScreen')}}>
+      <TouchableOpacity style={styles.bottomButton} onPress={() => navigation.navigate('PredictScreen')}>
         <Image source={require('../../assets/camera-icon.png')} style={styles.icon} />
         <Text style={styles.buttonText}>Device Detection</Text>
       </TouchableOpacity>
@@ -197,12 +173,6 @@ const styles = StyleSheet.create({
   },
   button9: {
     backgroundColor: '#FFCCBC',
-  },
-  button10: {
-    backgroundColor: '#BA721A',
-  },
-  button11: {
-    backgroundColor: '#C2C3C4',
   },
   buttonText: {
     fontSize: 20,

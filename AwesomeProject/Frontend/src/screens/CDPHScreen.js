@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
 import SearchHistoryService from './SearchHistoryService';
 import { BACKEND_URL } from '../../config.js';
-import { logQuery } from './HomeScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -28,8 +27,6 @@ const CDPHScreen = () => {
             deviceName,
             firmName
         };
-
-        logQuery("CDPH");
 
         try {
             const response = await fetch(`${BACKEND_URL}/cdph`, {
