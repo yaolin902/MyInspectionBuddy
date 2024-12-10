@@ -5,7 +5,7 @@ const { width } = Dimensions.get('window');
 
 const CAEntityResultsScreen = ({ route }) => {
     const { results } = route.params;
-    console.log("Rendering results:", results); // Log the results to verify
+    //console.log("Rendering results:", results); // Log the results to verify
 
     const renderItem = ({ item }) => (
         <View style={styles.row}>

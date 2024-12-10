@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -24,7 +24,75 @@ const MaudeScreen = () => {
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const navigation = useNavigation();
+
+    useEffect(() => {
+        loadHistoricalSearches();
+    }, []);
+
+    const loadHistoricalSearches = async () => {
+        try {
+            const history = await SearchHistoryService.getHistory('MAUDE');
+            setSuggestions(history);
+        } catch (error) {
+            console.error('Error loading historical searches:', error);
+        }
+    };
+
+    const handleDeviceNameChange = (text) => {
+        setDeviceName(text);
+        setShowSuggestions(text.length > 0);
+    };
+
+    const handleSuggestionSelect = (historyItem) => {
+        setDeviceName(historyItem.deviceName || '');
+        
+        if (historyItem.fromDate) {
+            const parsedFromDate = new Date(historyItem.fromDate);
+            if (!isNaN(parsedFromDate.getTime())) {
+                setFromDate(parsedFromDate);
+            }
+        }
+        
+        if (historyItem.toDate) {
+            const parsedToDate = new Date(historyItem.toDate);
+            if (!isNaN(parsedToDate.getTime())) {
+                setToDate(parsedToDate);
+            }
+        }
+        
+        setShowSuggestions(false);
+    };
+
+    const renderSuggestions = () => {
+        if (!showSuggestions || !deviceName.trim()) return null;
+
+        const filteredSuggestions = suggestions.filter(item => 
+            item.deviceName && 
+            item.deviceName.toLowerCase().includes(deviceName.toLowerCase())
+        );
+
+        if (filteredSuggestions.length === 0) return null;
+
+        return (
+            <View style={styles.suggestionsContainer}>
+                {filteredSuggestions.map((item, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        style={styles.suggestionItem}
+                        onPress={() => handleSuggestionSelect(item)}
+                    >
+                        <Text style={styles.suggestionPrimary}>{item.deviceName}</Text>
+                        <Text style={styles.suggestionSecondary}>
+                            {`Search Period: ${formatDateForDisplay(new Date(item.fromDate))} - ${formatDateForDisplay(new Date(item.toDate))}`}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        );
+    };
 
     const handleHistorySelect = (historyItem) => {
         setDeviceName(historyItem.deviceName || '');
@@ -68,8 +136,8 @@ const MaudeScreen = () => {
         };
 
         try {
-            // Save to history immediately when search is initiated
             await SearchHistoryService.saveSearch('MAUDE', searchParams);
+            await loadHistoricalSearches();
 
             const response = await fetch(`${BACKEND_URL}/maude`, {
                 method: 'POST',
@@ -80,7 +148,7 @@ const MaudeScreen = () => {
             });
 
             const result = await response.json();
-
+            
             if (result.error) {
                 Alert.alert('Error', result.error);
             } else {
@@ -122,8 +190,10 @@ const MaudeScreen = () => {
                         style={styles.searchBar}
                         placeholder="Enter Device Generic Name"
                         value={deviceName}
-                        onChangeText={setDeviceName}
+                        onChangeText={handleDeviceNameChange}
+                        onFocus={() => setShowSuggestions(true)}
                     />
+                    {renderSuggestions()}
                 </View>
 
                 <View style={styles.dateSection}>
@@ -174,15 +244,6 @@ const MaudeScreen = () => {
                 </TouchableOpacity>
 
                 <Text style={styles.requiredField}>* Required field</Text>
-
-                {isLoading && (
-                    <View style={styles.loadingOverlay}>
-                        <ActivityIndicator size="large" color="#007AFF" />
-                        <Text style={styles.loadingText}>
-                            Searching MAUDE Database...
-                        </Text>
-                    </View>
-                )}
             </View>
         </ScrollView>
     );
@@ -248,21 +309,34 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontStyle: 'italic',
     },
-    loadingOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
+    suggestionsContainer: {
+        marginTop: 5,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        maxHeight: 200,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
-    loadingText: {
-        marginTop: 10,
+    suggestionItem: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    suggestionPrimary: {
         fontSize: 16,
-        color: '#333',
+        color: '#007AFF',
+        fontWeight: '500',
+        marginBottom: 4,
+    },
+    suggestionSecondary: {
+        fontSize: 14,
+        color: '#666',
+        lineHeight: 18,
     }
 });
 

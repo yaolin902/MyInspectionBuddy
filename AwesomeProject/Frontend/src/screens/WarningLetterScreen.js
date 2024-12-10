@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -7,7 +7,8 @@ import {
     TouchableOpacity,
     Alert,
     ScrollView,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
@@ -17,7 +18,60 @@ import { BACKEND_URL } from '../../config.js';
 const WarningLetterScreen = () => {
     const [firmName, setFirmName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const navigation = useNavigation();
+
+    useEffect(() => {
+        loadHistoricalSearches();
+    }, []);
+
+    const loadHistoricalSearches = async () => {
+        try {
+            const history = await SearchHistoryService.getHistory('WARNING_LETTER');
+            setSuggestions(history);
+        } catch (error) {
+            console.error('Error loading historical searches:', error);
+        }
+    };
+
+    const handleFirmNameChange = (text) => {
+        setFirmName(text);
+        setShowSuggestions(text.length > 0);
+    };
+
+    const handleSuggestionSelect = (historyItem) => {
+        setFirmName(historyItem.firmName || '');
+        setShowSuggestions(false);
+    };
+
+    const renderSuggestions = () => {
+        if (!showSuggestions || !firmName.trim()) return null;
+
+        const filteredSuggestions = suggestions.filter(item => 
+            item.firmName && 
+            item.firmName.toLowerCase().includes(firmName.toLowerCase())
+        );
+
+        if (filteredSuggestions.length === 0) return null;
+
+        return (
+            <View style={styles.suggestionsContainer}>
+                {filteredSuggestions.map((item, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        style={styles.suggestionItem}
+                        onPress={() => handleSuggestionSelect(item)}
+                    >
+                        <Text style={styles.suggestionPrimary}>{item.firmName}</Text>
+                        <Text style={styles.suggestionSecondary}>
+                            {`Last searched: ${new Date(item.timestamp).toLocaleDateString()}`}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        );
+    };
 
     const handleHistorySelect = (historyItem) => {
         setFirmName(historyItem.firmName || '');
@@ -41,8 +95,8 @@ const WarningLetterScreen = () => {
         };
 
         try {
-            // Save to history immediately
             await SearchHistoryService.saveSearch('WARNING_LETTER', searchParams);
+            await loadHistoricalSearches();
 
             const response = await fetch(`${BACKEND_URL}/warning_letters`, {
                 method: 'POST',
@@ -60,7 +114,7 @@ const WarningLetterScreen = () => {
                 if (result && result.length > 0) {
                     navigation.navigate('WarningLetterResultsScreen', { results: result });
                 } else {
-                    Alert.alert('No Results', 'No warning letters found for the provided criteria.');
+                    Alert.alert('No Results', 'No warning letters found for the provided firm.');
                 }
             }
         } catch (error) {
@@ -87,10 +141,12 @@ const WarningLetterScreen = () => {
                         style={styles.input}
                         placeholder="Enter firm name"
                         value={firmName}
-                        onChangeText={setFirmName}
+                        onChangeText={handleFirmNameChange}
+                        onFocus={() => setShowSuggestions(true)}
                         returnKeyType="search"
                         onSubmitEditing={fetchData}
                     />
+                    {renderSuggestions()}
                 </View>
 
                 <TouchableOpacity
@@ -165,6 +221,35 @@ const styles = StyleSheet.create({
         marginTop: 10,
         textAlign: 'center',
         fontStyle: 'italic',
+    },
+    suggestionsContainer: {
+        marginTop: 5,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        maxHeight: 200,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    suggestionItem: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    suggestionPrimary: {
+        fontSize: 16,
+        color: '#007AFF',
+        fontWeight: '500',
+        marginBottom: 4,
+    },
+    suggestionSecondary: {
+        fontSize: 14,
+        color: '#666',
+        lineHeight: 18,
     }
 });
 
