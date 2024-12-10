@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -7,7 +7,8 @@ import {
     TouchableOpacity,
     Alert,
     ScrollView,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
@@ -17,7 +18,61 @@ const OpenHistoricalScreen = () => {
     const [keyword, setKeyword] = useState('');
     const [year, setYear] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const navigation = useNavigation();
+
+    useEffect(() => {
+        loadHistoricalSearches();
+    }, []);
+
+    const loadHistoricalSearches = async () => {
+        try {
+            const history = await SearchHistoryService.getHistory('OPEN_HISTORICAL');
+            setSuggestions(history);
+        } catch (error) {
+            console.error('Error loading historical searches:', error);
+        }
+    };
+
+    const handleKeywordChange = (text) => {
+        setKeyword(text);
+        setShowSuggestions(text.length > 0);
+    };
+
+    const handleSuggestionSelect = (historyItem) => {
+        setKeyword(historyItem.keyword || '');
+        setYear(historyItem.year || '');
+        setShowSuggestions(false);
+    };
+
+    const renderSuggestions = () => {
+        if (!showSuggestions || !keyword.trim()) return null;
+
+        const filteredSuggestions = suggestions.filter(item => 
+            item.keyword && 
+            item.keyword.toLowerCase().includes(keyword.toLowerCase())
+        );
+
+        if (filteredSuggestions.length === 0) return null;
+
+        return (
+            <View style={styles.suggestionsContainer}>
+                {filteredSuggestions.map((item, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        style={styles.suggestionItem}
+                        onPress={() => handleSuggestionSelect(item)}
+                    >
+                        <Text style={styles.suggestionPrimary}>{item.keyword}</Text>
+                        <Text style={styles.suggestionSecondary}>
+                            {item.year && `Year: ${item.year}`}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        );
+    };
 
     const handleHistorySelect = (historyItem) => {
         setKeyword(historyItem.keyword || '');
@@ -47,8 +102,8 @@ const OpenHistoricalScreen = () => {
         };
 
         try {
-            // Save to history immediately
             await SearchHistoryService.saveSearch('OPEN_HISTORICAL', searchParams);
+            await loadHistoricalSearches();
 
             const response = await fetch('http://10.0.0.3:5001/openhistorical', {
                 method: 'POST',
@@ -93,8 +148,10 @@ const OpenHistoricalScreen = () => {
                         style={styles.input}
                         placeholder="Enter keyword"
                         value={keyword}
-                        onChangeText={setKeyword}
+                        onChangeText={handleKeywordChange}
+                        onFocus={() => setShowSuggestions(true)}
                     />
+                    {renderSuggestions()}
 
                     <Text style={styles.label}>Year:</Text>
                     <TextInput
@@ -102,6 +159,7 @@ const OpenHistoricalScreen = () => {
                         placeholder="Enter year (YYYY)"
                         value={year}
                         onChangeText={setYear}
+                        onFocus={() => setShowSuggestions(false)}
                         keyboardType="numeric"
                         maxLength={4}
                     />
@@ -180,6 +238,36 @@ const styles = StyleSheet.create({
         marginTop: 10,
         textAlign: 'center',
         fontStyle: 'italic',
+    },
+    suggestionsContainer: {
+        marginTop: -10,
+        marginBottom: 15,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        maxHeight: 200,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    suggestionItem: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    suggestionPrimary: {
+        fontSize: 16,
+        color: '#007AFF',
+        fontWeight: '500',
+        marginBottom: 4,
+    },
+    suggestionSecondary: {
+        fontSize: 14,
+        color: '#666',
+        lineHeight: 18,
     }
 });
 
