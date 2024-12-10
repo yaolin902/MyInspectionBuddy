@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -6,56 +6,78 @@ import {
     StyleSheet,
     TouchableOpacity,
     Alert,
-    ActivityIndicator,
     ScrollView,
-    RefreshControl,
-    Keyboard,
-    Platform
+    ActivityIndicator
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import UniversalSearchHistory from './UniversalSearchHistory';
 import SearchHistoryService from './SearchHistoryService';
-import { MaterialIcons } from '@expo/vector-icons';
 
 const CAEntitySearchScreen = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [refreshing, setRefreshing] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const navigation = useNavigation();
 
-    // Reset error when screen gains focus
-    useFocusEffect(
-        useCallback(() => {
-            setError('');
-        }, [])
-    );
+    useEffect(() => {
+        loadHistoricalSearches();
+    }, []);
+
+    const loadHistoricalSearches = async () => {
+        try {
+            const history = await SearchHistoryService.getHistory('CA_ENTITY');
+            setSuggestions(history);
+        } catch (error) {
+            console.error('Error loading historical searches:', error);
+        }
+    };
+
+    const handleSearchTermChange = (text) => {
+        setSearchTerm(text);
+        setShowSuggestions(text.length > 0);
+    };
+
+    const handleSuggestionSelect = (historyItem) => {
+        setSearchTerm(historyItem.searchTerm || '');
+        setShowSuggestions(false);
+    };
+
+    const renderSuggestions = () => {
+        if (!showSuggestions || !searchTerm.trim()) return null;
+
+        const filteredSuggestions = suggestions.filter(item => 
+            item.searchTerm && 
+            item.searchTerm.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        if (filteredSuggestions.length === 0) return null;
+
+        return (
+            <View style={styles.suggestionsContainer}>
+                {filteredSuggestions.map((item, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        style={styles.suggestionItem}
+                        onPress={() => handleSuggestionSelect(item)}
+                    >
+                        <Text style={styles.suggestionPrimary}>{item.searchTerm}</Text>
+                        <Text style={styles.suggestionSecondary}>
+                            {`Last searched: ${new Date(item.timestamp).toLocaleDateString()}`}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        );
+    };
 
     const handleHistorySelect = (historyItem) => {
         setSearchTerm(historyItem.searchTerm || '');
-        setError('');
     };
-
-    const handleClearInput = () => {
-        setSearchTerm('');
-        setError('');
-        Keyboard.dismiss();
-    };
-
-    const onRefresh = useCallback(async () => {
-        setRefreshing(true);
-        setError('');
-        setSearchTerm('');
-        setRefreshing(false);
-    }, []);
 
     const validateSearch = () => {
         if (!searchTerm.trim()) {
-            setError('Please enter a search term');
-            return false;
-        }
-        if (searchTerm.trim().length < 2) {
-            setError('Search term must be at least 2 characters');
+            Alert.alert('Error', 'Please enter a search term');
             return false;
         }
         return true;
@@ -65,23 +87,15 @@ const CAEntitySearchScreen = () => {
         if (!validateSearch()) return;
 
         setIsLoading(true);
-        setError('');
-        Keyboard.dismiss();
 
-        // Store search params immediately when user searches
         const searchParams = {
             searchTerm: searchTerm.trim()
         };
 
-        // Save to history immediately when search is initiated
         try {
             await SearchHistoryService.saveSearch('CA_ENTITY', searchParams);
-        } catch (error) {
-            console.error('Error saving to history:', error);
-            // Don't block the search if history saving fails
-        }
+            await loadHistoricalSearches();
 
-        try {
             const response = await fetch('http://10.0.0.3:5001/ca-business-entity', {
                 method: 'POST',
                 headers: {
@@ -93,131 +107,64 @@ const CAEntitySearchScreen = () => {
             const result = await response.json();
 
             if (result.error) {
-                setError(result.error);
                 Alert.alert('Error', result.error);
             } else {
                 if (result && result.length > 0) {
                     navigation.navigate('CAEntityResultsScreen', { results: result });
                 } else {
-                    Alert.alert(
-                        'No Results',
-                        'No business entities found matching your search criteria.',
-                        [{ text: 'OK' }]
-                    );
+                    Alert.alert('No Results', 'No business entities found for the provided search term.');
                 }
             }
         } catch (error) {
             console.error('Error fetching data:', error);
-            setError('Failed to connect to the server. Please try again.');
-            Alert.alert(
-                'Connection Error',
-                'Unable to reach the server. Please check your connection and try again.',
-                [{ text: 'OK' }]
-            );
+            Alert.alert('Error', 'Failed to fetch data from the server');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollViewContent}
-            keyboardShouldPersistTaps="handled"
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={['#007AFF']}
-                    tintColor="#007AFF"
-                />
-            }
-        >
+        <ScrollView style={styles.scrollView}>
             <View style={styles.container}>
-                <View style={styles.headerContainer}>
-                    <Text style={styles.title}>CA Business Entity Search</Text>
-                    <Text style={styles.subtitle}>
-                        Search California Business Database
-                    </Text>
-                </View>
+                <Text style={styles.title}>CA Business Entity Search</Text>
 
                 <UniversalSearchHistory
                     searchType="CA_ENTITY"
                     onSelectHistory={handleHistorySelect}
                 />
 
-                <View style={styles.searchSection}>
-                    <Text style={styles.label}>Business Name or Number*</Text>
-                    <View style={styles.searchInputContainer}>
-                        <TextInput
-                            style={styles.searchBar}
-                            placeholder="Enter business name or entity number"
-                            value={searchTerm}
-                            onChangeText={(text) => {
-                                setSearchTerm(text);
-                                setError('');
-                            }}
-                            placeholderTextColor="#666"
-                            autoCapitalize="words"
-                            returnKeyType="search"
-                            onSubmitEditing={fetchData}
-                            editable={!isLoading}
-                        />
-                        {searchTerm.length > 0 && (
-                            <TouchableOpacity
-                                style={styles.clearButton}
-                                onPress={handleClearInput}
-                            >
-                                <MaterialIcons name="clear" size={20} color="#666" />
-                            </TouchableOpacity>
-                        )}
-                    </View>
-
-                    {error ? (
-                        <Text style={styles.errorText}>{error}</Text>
-                    ) : (
-                        <Text style={styles.hint}>
-                            Enter business name, entity number, or LLC name
-                        </Text>
-                    )}
+                <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Search Term: *</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter business name or number"
+                        value={searchTerm}
+                        onChangeText={handleSearchTermChange}
+                        onFocus={() => setShowSuggestions(true)}
+                        returnKeyType="search"
+                        onSubmitEditing={fetchData}
+                    />
+                    {renderSuggestions()}
                 </View>
 
                 <TouchableOpacity
-                    style={[
-                        styles.searchButton,
-                        (!searchTerm.trim() || isLoading) && styles.searchButtonDisabled
-                    ]}
+                    style={[styles.searchButton, isLoading && styles.searchButtonDisabled]}
                     onPress={fetchData}
-                    disabled={isLoading || !searchTerm.trim()}
+                    disabled={isLoading}
                 >
                     {isLoading ? (
                         <ActivityIndicator color="#FFFFFF" />
                     ) : (
-                        <>
-                            <MaterialIcons name="search" size={24} color="#FFFFFF" />
-                            <Text style={styles.searchButtonText}>Search</Text>
-                        </>
+                        <Text style={styles.searchButtonText}>Search</Text>
                     )}
                 </TouchableOpacity>
 
                 <Text style={styles.requiredField}>* Required field</Text>
 
-                <View style={styles.infoContainer}>
-                    <Text style={styles.infoText}>
-                        This search queries the California Secretary of State's
-                        business database for active and inactive business entities.
-                    </Text>
-                </View>
+                <Text style={styles.hint}>
+                    Enter business name, entity number, or LLC name
+                </Text>
             </View>
-
-            {isLoading && (
-                <View style={styles.loadingOverlay}>
-                    <ActivityIndicator size="large" color="#007AFF" />
-                    <Text style={styles.loadingText}>
-                        Searching Business Entities...
-                    </Text>
-                </View>
-            )}
         </ScrollView>
     );
 };
@@ -225,132 +172,93 @@ const CAEntitySearchScreen = () => {
 const styles = StyleSheet.create({
     scrollView: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
-    },
-    scrollViewContent: {
-        flexGrow: 1,
+        backgroundColor: '#f5f5f5',
     },
     container: {
         flex: 1,
         padding: 20,
     },
-    headerContainer: {
-        marginBottom: 24,
-        alignItems: 'center',
-    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
         color: '#333',
-        textAlign: 'center',
     },
-    subtitle: {
-        fontSize: 16,
-        color: '#666',
-        marginTop: 8,
-        textAlign: 'center',
-    },
-    searchSection: {
-        width: '100%',
-        marginBottom: 24,
+    inputContainer: {
+        marginBottom: 20,
     },
     label: {
         fontSize: 16,
+        marginBottom: 8,
         fontWeight: '500',
         color: '#333',
-        marginBottom: 8,
     },
-    searchInputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    input: {
         borderWidth: 1,
-        borderColor: '#DDD',
+        borderColor: '#ddd',
         borderRadius: 8,
-        backgroundColor: '#F8F8F8',
-    },
-    searchBar: {
-        flex: 1,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        padding: 12,
+        backgroundColor: '#fff',
         fontSize: 16,
-        color: '#333',
-    },
-    clearButton: {
-        padding: 8,
-        marginRight: 8,
     },
     hint: {
-        fontSize: 12,
         color: '#666',
-        marginTop: 4,
-        marginLeft: 4,
-    },
-    errorText: {
-        fontSize: 12,
-        color: '#FF3B30',
-        marginTop: 4,
-        marginLeft: 4,
+        fontSize: 14,
+        marginTop: 8,
+        textAlign: 'center',
+        fontStyle: 'italic',
     },
     searchButton: {
-        flexDirection: 'row',
         backgroundColor: '#007AFF',
-        paddingHorizontal: 24,
-        paddingVertical: 14,
+        padding: 15,
         borderRadius: 8,
         alignItems: 'center',
-        justifyContent: 'center',
         marginTop: 10,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
     },
     searchButtonDisabled: {
-        backgroundColor: '#CCCCCC',
+        backgroundColor: '#999',
     },
     searchButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
-        marginLeft: 8,
     },
     requiredField: {
-        fontSize: 12,
         color: '#666',
-        marginTop: 16,
+        fontSize: 12,
+        marginTop: 10,
         textAlign: 'center',
+        fontStyle: 'italic',
     },
-    infoContainer: {
-        marginTop: 24,
-        padding: 16,
-        backgroundColor: '#F0F7FF',
-        borderRadius: 8,
+    suggestionsContainer: {
+        marginTop: 5,
+        backgroundColor: '#fff',
         borderWidth: 1,
-        borderColor: '#D0E3FF',
+        borderColor: '#ddd',
+        borderRadius: 8,
+        maxHeight: 200,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
-    infoText: {
-        fontSize: 14,
-        color: '#333',
-        lineHeight: 20,
-        textAlign: 'center',
+    suggestionItem: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
     },
-    loadingOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-    },
-    loadingText: {
-        marginTop: 12,
+    suggestionPrimary: {
         fontSize: 16,
-        color: '#333',
-        textAlign: 'center',
+        color: '#007AFF',
+        fontWeight: '500',
+        marginBottom: 4,
+    },
+    suggestionSecondary: {
+        fontSize: 14,
+        color: '#666',
+        lineHeight: 18,
     }
 });
 
