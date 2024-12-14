@@ -50,15 +50,15 @@ const PredictScreen = () => {
 
   // Take Photo with Camera
   const takePhoto = async () => {
-  // Request Permissions
-  const { status } = await Camera.requestCameraPermissionsAsync();
-
-  if (status !== 'granted') {
-    Alert.alert('Permission to access the camera is required!');
-    return;
-  }
-
   try {
+    // Request Camera Permissions
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission to access the camera is required!');
+      return;
+    }
+
+    // Launch Camera
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -70,12 +70,13 @@ const PredictScreen = () => {
       setImageUri(uri);
       setResultImage(null); // Reset previous result
       setShowReturnButton(false);
+      console.log("Photo taken:", uri);
     } else {
-      console.log('Camera canceled or no image taken');
+      console.log("Camera action was canceled.");
     }
   } catch (error) {
-    console.error('Error taking photo:', error);
-    Alert.alert('Error taking photo');
+    console.error("Error taking photo:", error);
+    Alert.alert("Error taking photo");
   }
 };
 
