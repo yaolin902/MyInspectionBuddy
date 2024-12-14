@@ -9,52 +9,85 @@ import {
   Alert,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as Camera from 'expo-camera';
 import axios from 'axios';
 
 const PredictScreen = () => {
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resultImage, setResultImage] = useState(null);
-  const [showConfirmButton, setShowConfirmButton] = useState(false);
   const [showReturnButton, setShowReturnButton] = useState(false);
 
-  // Select Image Function
-  const selectImage = async () => {
-    try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission to access media library is required!');
-        return;
-      }
+  // Request Permissions for Camera and Media Library
+  const requestPermissions = async () => {
+    const cameraPermission = await Camera.requestCameraPermissionsAsync();
+    const mediaLibraryPermission =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const uri = result.assets[0].uri;
-        setImageUri(uri);
-        setShowConfirmButton(true);
-        setShowReturnButton(false);
-      }
-    } catch (error) {
-      console.error('Error selecting image:', error);
+    if (
+      cameraPermission.status !== 'granted' ||
+      mediaLibraryPermission.status !== 'granted'
+    ) {
+      Alert.alert('Permission to access camera and media library is required!');
     }
   };
 
-  // Upload Image Function
+  // Select Image from Media Library
+  const selectImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const uri = result.assets[0].uri;
+      setImageUri(uri);
+      setResultImage(null); // Reset previous result
+      setShowReturnButton(false);
+    }
+  };
+
+  // Take Photo with Camera
+  const takePhoto = async () => {
+  // Request Permissions
+  const { status } = await Camera.requestCameraPermissionsAsync();
+
+  if (status !== 'granted') {
+    Alert.alert('Permission to access the camera is required!');
+    return;
+  }
+
+  try {
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const uri = result.assets[0].uri;
+      setImageUri(uri);
+      setResultImage(null); // Reset previous result
+      setShowReturnButton(false);
+    } else {
+      console.log('Camera canceled or no image taken');
+    }
+  } catch (error) {
+    console.error('Error taking photo:', error);
+    Alert.alert('Error taking photo');
+  }
+};
+
+
+  // Upload Image to Flask Server
   const uploadImage = async () => {
     if (!imageUri) {
-      Alert.alert('Please select an image first');
+      Alert.alert('Please select or take a photo first');
       return;
     }
 
     setLoading(true);
-    setResultImage(null);
 
     const formData = new FormData();
     formData.append('file', {
@@ -72,8 +105,10 @@ const PredictScreen = () => {
         timeout: 30000,
       });
 
+      // Update UI: Show result image and hide original
       setResultImage(response.data.result);
-      setShowReturnButton(true);
+      setImageUri(null); // Hide original image
+      setShowReturnButton(true); // Show Return Button
     } catch (error) {
       console.error('Error uploading image:', error.message);
       Alert.alert('Error uploading image');
@@ -82,22 +117,23 @@ const PredictScreen = () => {
     }
   };
 
-  // Reset UI Function
+  // Reset the UI
   const returnToMain = () => {
     setImageUri(null);
     setResultImage(null);
-    setShowConfirmButton(false);
     setShowReturnButton(false);
   };
 
   return (
     <View style={styles.container}>
-      {!imageUri && (
+      {!imageUri && !resultImage && (
         <>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={selectImage}>
+          <TouchableOpacity style={styles.button} onPress={selectImage}>
             <Text style={styles.buttonText}>Select Image</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={takePhoto}>
+            <Text style={styles.buttonText}>Take Photo</Text>
           </TouchableOpacity>
         </>
       )}
@@ -106,13 +142,11 @@ const PredictScreen = () => {
         <>
           <Image source={{ uri: imageUri }} style={styles.image} />
 
-          {showConfirmButton && (
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={uploadImage}>
-              <Text style={styles.buttonText}>Confirm</Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            style={styles.confirmButton}
+            onPress={uploadImage}>
+            <Text style={styles.buttonText}>Confirm</Text>
+          </TouchableOpacity>
         </>
       )}
 
