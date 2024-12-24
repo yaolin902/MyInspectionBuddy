@@ -1,7 +1,7 @@
 # MyInspectionBuddy
 App assisting medical device inspections.
 
-<img src="[https://github.com/argus1/MyInspectionBuddy/blob/main/images/inspectionbuddy.webp](https://github.com/argus1/MyInspectionBuddy/blob/main/buddy.png)" width="250" height="250">
+![concept](https://github.com/argus1/MyInspectionBuddy/blob/main/buddy.png)
 
 This app seeks to enhance the capabilities of environmental scientists and sworn staff who are tasked with inspection of medical device manufacturers.
 
