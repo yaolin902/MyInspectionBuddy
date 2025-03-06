@@ -56,28 +56,28 @@ steps:
       # Set environment variables
       echo "##vso[task.setvariable variable=OLD_VERSION]$oldVer"
       echo "##vso[task.setvariable variable=NEW_VERSION]$newVer"
-    displayName: 'Bump version and set variables'
-  - task: ios-bundle-version@1
-    displayName: 'Bump iOS version'
-    inputs:
-      sourcePath: 'ios/MyProject/Info.plist'
-      versionCodeOption: 'buildid'
-      versionCode: '$(Build.BuildId)'
-      versionName: '$(NEW_VERSION)'
-      printFile: false
-  - task: InstallAppleCertificate@2
-    displayName: Install Apple Certificate
-    inputs:
-      certSecureFile: 'MobileProd.p12'
-      certPwd: '$(AppleP12Password)'
-      keychain: 'temp'
-      deleteCert: true
-  - task: InstallAppleProvisioningProfile@1
-    displayName: 'Install Apple Provisioning Profile'
-    inputs:
-      provisioningProfileLocation: 'secureFiles'
-      provProfileSecureFile: 'MyProject.mobileprovision'
-      removeProfile: true
+#     displayName: 'Bump version and set variables'
+#   - task: ios-bundle-version@1
+#     displayName: 'Bump iOS version'
+#     inputs:
+#       sourcePath: 'ios/MyProject/Info.plist'
+#       versionCodeOption: 'buildid'
+#       versionCode: '$(Build.BuildId)'
+#       versionName: '$(NEW_VERSION)'
+#       printFile: false
+#   - task: InstallAppleCertificate@2
+#     displayName: Install Apple Certificate
+#     inputs:
+#       certSecureFile: 'MobileProd.p12'
+#       certPwd: '$(AppleP12Password)'
+#       keychain: 'temp'
+#       deleteCert: true
+#   - task: InstallAppleProvisioningProfile@1
+#     displayName: 'Install Apple Provisioning Profile'
+#     inputs:
+#       provisioningProfileLocation: 'secureFiles'
+#       provProfileSecureFile: 'MyProject.mobileprovision'
+#       removeProfile: true
   - task: CocoaPods@0
     displayName: 'Install CocoaPods'
     inputs:
@@ -118,14 +118,14 @@ steps:
       PathtoPublish: '$(build.artifactStagingDirectory)'
       ArtifactName: 'ios'
       publishLocation: 'Container'
-  - task: AppCenterDistribute@3
-    displayName: 'Upload IPA to AppCenter'
-    inputs:
-      serverEndpoint: 'App Center'
-      appSlug: 'hnadeem/MyProject-iOS'
-      appFile: 'output/MyProject.ipa'
-      releaseNotesOption: 'file'
-      isMandatory: true
-      destinationType: 'groups'
-      distributionGroupId: '058a4704-ea24-4877-a2f0-bdfaff9335dc'
-      isSilent: true
+#   - task: AppCenterDistribute@3
+#     displayName: 'Upload IPA to AppCenter'
+#     inputs:
+#       serverEndpoint: 'App Center'
+#       appSlug: 'hnadeem/MyProject-iOS'
+#       appFile: 'output/MyProject.ipa'
+#       releaseNotesOption: 'file'
+#       isMandatory: true
+#       destinationType: 'groups'
+#       distributionGroupId: '058a4704-ea24-4877-a2f0-bdfaff9335dc'
+#       isSilent: true
