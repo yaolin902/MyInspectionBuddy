@@ -20,7 +20,7 @@
 trigger:
   branches:
     include:
-      - master
+      - main
 
 variables:
   - group: Mobile
