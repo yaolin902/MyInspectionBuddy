@@ -65,10 +65,6 @@ steps:
       npm install -g eas-cli
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: Install EAS build dependencies
-  - task: CocoaPods@0
-    displayName: 'Install CocoaPods'
-    inputs:
-      workingDirectory: 'AwesomeProject/Frontend-IPA'
   - bash: |
       npx expo prebuild --clean -p ios
     workingDirectory: "AwesomeProject/Frontend-IPA"
@@ -104,6 +100,10 @@ steps:
       git push origin $(Build.SourceBranchName)
       git push --tags
     displayName: Bump commit
+  - task: CocoaPods@0
+    displayName: 'Install CocoaPods'
+    inputs:
+      workingDirectory: 'AwesomeProject/Frontend-IPA/ios'
   - task: Xcode@5
     displayName: 'Build IPA'
     inputs:
