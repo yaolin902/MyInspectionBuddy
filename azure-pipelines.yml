@@ -68,6 +68,7 @@ steps:
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: Install EAS build dependencies
   - script: yarn run prebuild:clean
+    workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: 'Prebuilding the project [generate ios/android projects]'
   - task: ios-bundle-version@1
     displayName: 'Bump iOS version'
