@@ -69,14 +69,11 @@ steps:
     displayName: Install EAS build dependencies
   - script: npx expo prebuild -p ios --clean
     workingDirectory: "AwesomeProject/Frontend-IPA"
-    displayName: 'Prebuilding the project [generate ios/android projects]'
-  - bash: ls && ls ios
-    workingDirectory: "AwesomeProject/Frontend-IPA"
-    displayName: list current dir
+    displayName: 'Prebuilding the project [generate xcode project]'
   - task: ios-bundle-version@1
     displayName: 'Bump iOS version'
     inputs:
-      sourcePath: 'AwesomeProject/Frontend-IPA/ios/MyInspectionBuddy/Info.plist'
+      sourcePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject/Info.plist'
       versionCodeOption: 'buildid'
       versionCode: '$(Build.BuildId)'
       versionName: '$(NEW_VERSION)'
@@ -114,7 +111,7 @@ steps:
       actions: 'build'
       configuration: 'Release'
       sdk: 'iphoneos'
-      xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/MyInspectionBuddy.xcworkspace'
+      xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject.xcworkspace'
       scheme: 'MyProject'
       packageApp: true
       exportPath: 'output'
