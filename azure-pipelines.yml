@@ -37,6 +37,7 @@ steps:
     inputs:
       versionSpec: '12.19.0' # you can use your desired version here
   - script: yarn install
+    workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: Install Dependencies
   - script: |
       # Disable autocommit on version bump
@@ -57,10 +58,20 @@ steps:
       echo "##vso[task.setvariable variable=OLD_VERSION]$oldVer"
       echo "##vso[task.setvariable variable=NEW_VERSION]$newVer"
     displayName: 'Bump version and set variables'
+  - bash: | 
+      set -x
+      npm install -g expo-cli
+      npm install -g eas-cli
+    workingDirectory: "AwesomeProject/Frontend-IPA"
+    displayName: Install EAS build dependencies
+  - bash: |
+      npx expo prebuild --clean -p ios
+    workingDirectory: "AwesomeProject/Frontend-IPA"
+    displayName: Build .app using EAS prebuilt
   - task: ios-bundle-version@1
     displayName: 'Bump iOS version'
     inputs:
-      sourcePath: 'ios/MyProject/Info.plist'
+      sourcePath: 'AwesomeProject/Frontend-IPA/ios/Info.plist'
       versionCodeOption: 'buildid'
       versionCode: '$(Build.BuildId)'
       versionName: '$(NEW_VERSION)'
@@ -81,7 +92,7 @@ steps:
   - task: CocoaPods@0
     displayName: 'Install CocoaPods'
     inputs:
-      workingDirectory: 'ios'
+      workingDirectory: 'AwesomeProject/Frontend-IPA/ios'
   - script: |
       tag="mobile_$(NEW_VERSION)"
       echo "New tag $tag"
@@ -98,7 +109,7 @@ steps:
       actions: 'build'
       configuration: 'Release'
       sdk: 'iphoneos'
-      xcWorkspacePath: 'ios/MyProject.xcworkspace'
+      xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/MyInspectionBuddy.xcworkspace'
       scheme: 'MyProject'
       packageApp: true
       exportPath: 'output'
