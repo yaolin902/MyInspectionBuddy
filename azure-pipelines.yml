@@ -70,6 +70,9 @@ steps:
   - script: npx expo prebuild -p ios --clean
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: 'Prebuilding the project [generate ios/android projects]'
+  - bash: ls && ls ios
+    workingDirectory: "AwesomeProject/Frontend-IPA"
+    displayName: list current dir
   - task: ios-bundle-version@1
     displayName: 'Bump iOS version'
     inputs:
