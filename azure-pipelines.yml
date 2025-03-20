@@ -35,7 +35,7 @@ steps:
   - task: NodeTool@0
     displayName: 'Install Node'
     inputs:
-      versionSpec: '12.19.0' # you can use your desired version here
+      versionSpec: '20.19.0'
   - script: yarn install
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: Install Dependencies
