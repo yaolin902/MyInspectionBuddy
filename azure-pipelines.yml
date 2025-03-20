@@ -72,7 +72,7 @@ steps:
   - task: ios-bundle-version@1
     displayName: 'Bump iOS version'
     inputs:
-      sourcePath: 'AwesomeProject/Frontend-IPA/ios/Info.plist'
+      sourcePath: 'AwesomeProject/Frontend-IPA/ios/MyInspectionBuddy/Info.plist'
       versionCodeOption: 'buildid'
       versionCode: '$(Build.BuildId)'
       versionName: '$(NEW_VERSION)'
