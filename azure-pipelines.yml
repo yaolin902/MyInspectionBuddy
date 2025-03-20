@@ -67,7 +67,7 @@ steps:
       npm install -g eas-cli
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: Install EAS build dependencies
-  - script: npx expo prebuild
+  - script: npx expo prebuild -p ios --clean
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: 'Prebuilding the project [generate ios/android projects]'
   - task: ios-bundle-version@1
