@@ -39,8 +39,8 @@ steps:
   - script: yarn install
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: Install Dependencies
-  - script: npx expo install
-    displayName: 'Install expo dependencies'
+  # - script: npx expo install
+  #   displayName: 'Install expo dependencies'
   - script: |
       # Disable autocommit on version bump
       yarn config set version-sign-git-tag false
