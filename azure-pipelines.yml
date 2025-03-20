@@ -112,7 +112,7 @@ steps:
       configuration: 'Release'
       sdk: 'iphoneos'
       xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject.xcworkspace'
-      scheme: 'MyProject'
+      scheme: 'AwesomeProject'
       packageApp: true
       exportPath: 'output'
       signingOption: 'manual'
