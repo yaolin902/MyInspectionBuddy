@@ -68,7 +68,7 @@ steps:
   - task: CocoaPods@0
     displayName: 'Install CocoaPods'
     inputs:
-      workingDirectory: 'AwesomeProject/Frontend-IPA/ios'
+      workingDirectory: 'AwesomeProject/Frontend-IPA'
   - bash: |
       npx expo prebuild --clean -p ios
     workingDirectory: "AwesomeProject/Frontend-IPA"
