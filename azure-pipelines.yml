@@ -39,6 +39,8 @@ steps:
   - script: yarn install
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: Install Dependencies
+  - script: npx expo install
+    displayName: 'Install expo dependencies'
   - script: |
       # Disable autocommit on version bump
       yarn config set version-sign-git-tag false
@@ -65,10 +67,8 @@ steps:
       npm install -g eas-cli
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: Install EAS build dependencies
-  - bash: |
-      npx expo prebuild --clean -p ios
-    workingDirectory: "AwesomeProject/Frontend-IPA"
-    displayName: Build .app using EAS prebuilt
+  - script: yarn run prebuild:clean
+    displayName: 'Prebuilding the project [generate ios/android projects]'
   - task: ios-bundle-version@1
     displayName: 'Bump iOS version'
     inputs:
