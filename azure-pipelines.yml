@@ -106,7 +106,7 @@ steps:
   - task: Xcode@5
     displayName: 'Build IPA'
     inputs:
-      actions: 'clean build'
+      actions: 'clean archive'
       configuration: 'Release'
       sdk: 'iphoneos'
       xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject.xcworkspace'
@@ -117,7 +117,7 @@ steps:
       signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
       provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
       provisioningProfileName: '$(APPLE_PROV_PROFILE_NAME)'
-      args: '-configuration "CODE_SIGNING_ALLOWED=NO, CODE_SIGNING_REQUIRED=NO"'
+      args: '-verbose CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes'
   - task: CopyFiles@2
     displayName: 'Copy IPA'
     inputs:
