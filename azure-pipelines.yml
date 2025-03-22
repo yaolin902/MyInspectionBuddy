@@ -113,7 +113,7 @@ steps:
       scheme: 'AwesomeProject'
       packageApp: true
       exportPath: 'output'
-      signingOption: 'manual'
+      signingOption: 'default'
       signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
       provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
       args: '-verbose'
