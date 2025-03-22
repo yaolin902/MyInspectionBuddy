@@ -106,7 +106,7 @@ steps:
   - task: Xcode@5
     displayName: 'Build IPA'
     inputs:
-      actions: 'build'
+      actions: 'clean build'
       configuration: 'Release'
       sdk: 'iphoneos'
       xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject.xcworkspace'
@@ -116,6 +116,7 @@ steps:
       signingOption: 'manual'
       signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
       provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
+      args: '-verbose'
   - task: CopyFiles@2
     displayName: 'Copy IPA'
     inputs:
