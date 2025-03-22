@@ -39,8 +39,6 @@ steps:
   - script: yarn install
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: Install Dependencies
-  # - script: npx expo install
-  #   displayName: 'Install expo dependencies'
   - script: |
       # Disable autocommit on version bump
       yarn config set version-sign-git-tag false
@@ -78,19 +76,19 @@ steps:
       versionCode: '$(Build.BuildId)'
       versionName: '$(NEW_VERSION)'
       printFile: false
-#   - task: InstallAppleCertificate@2
-#     displayName: Install Apple Certificate
-#     inputs:
-#       certSecureFile: 'MobileProd.p12'
-#       certPwd: '$(AppleP12Password)'
-#       keychain: 'temp'
-#       deleteCert: true
-#   - task: InstallAppleProvisioningProfile@1
-#     displayName: 'Install Apple Provisioning Profile'
-#     inputs:
-#       provisioningProfileLocation: 'secureFiles'
-#       provProfileSecureFile: 'MyProject.mobileprovision'
-#       removeProfile: true
+  - task: InstallAppleCertificate@2
+    displayName: Install Apple Certificate
+    inputs:
+      certSecureFile: 'distributionCertificates.p12'
+      certPwd: '$(AppleP12Password)'
+      keychain: 'temp'
+      deleteCert: true
+  - task: InstallAppleProvisioningProfile@1
+    displayName: 'Install Apple Provisioning Profile'
+    inputs:
+      provisioningProfileLocation: 'secureFiles'
+      provProfileSecureFile: 'MyInspectionBuddy.mobileprovision'
+      removeProfile: true
   - script: |
       tag="mobile_$(NEW_VERSION)"
       echo "New tag $tag"
