@@ -116,7 +116,8 @@ steps:
       signingOption: 'default'
       signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
       provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
-      args: '-verbose'
+      provisioningProfileName: '$(APPLE_PROV_PROFILE_NAME)'
+      args: '-configuration "CODE_SIGNING_ALLOWED=NO, CODE_SIGNING_REQUIRED=NO"'
   - task: CopyFiles@2
     displayName: 'Copy IPA'
     inputs:
