@@ -106,14 +106,14 @@ steps:
   - task: Xcode@5
     displayName: 'Build IPA'
     inputs:
-      actions: 'clean archive'
+      actions: 'clean build'
       configuration: 'Release'
       sdk: 'iphoneos'
       xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject.xcworkspace'
       scheme: 'AwesomeProject'
       packageApp: true
       exportPath: 'output'
-      signingOption: 'auto'
+      signingOption: manual
       signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
       provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
       provisioningProfileName: '$(APPLE_PROV_PROFILE_NAME)'
