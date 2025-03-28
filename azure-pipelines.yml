@@ -117,6 +117,8 @@ jobs:
           provisioningProfileName: '$(APPLE_PROV_PROFILE_NAME)'
           teamId: '$(TeamID)'
           exportTeamId: '$(TeamID)'
+          exportOptions: 'specify'
+          exportMethod: 'app-store'
           args: '-verbose CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
       - task: CopyFiles@2
         displayName: 'Copy IPA'
