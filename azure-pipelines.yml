@@ -115,6 +115,8 @@ steps:
       else 
         echo "CocoaPods version is suitable for the project"
       fi;
+      npx pod-install
+    workingDirectory: 'AwesomeProject/Frontend-IPA/ios'
     displayName: 'Fix cocoapods'
   - task: Xcode@5
     displayName: 'Build IPA'
