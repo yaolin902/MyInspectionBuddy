@@ -117,9 +117,9 @@ steps:
       signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
       provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
       provisioningProfileName: '$(APPLE_PROV_PROFILE_NAME)'
-      teamId: '$(TeamID)'
-      exportTeamId: '$(TeamID)'
-      args: '-verbose CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes'
+      #teamId: '$(TeamID)'
+      #exportTeamId: '$(TeamID)'
+      #args: '-verbose CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes'
   - task: CopyFiles@2
     displayName: 'Copy IPA'
     inputs:
