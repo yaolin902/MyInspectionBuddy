@@ -72,12 +72,12 @@ steps:
       echo "##vso[task.setvariable variable=NEW_VERSION]$newVer"
     displayName: 'Bump version and set variables'
     workingDirectory: "AwesomeProject/Frontend-IPA"
-  - bash: | 
-      set -x
-      npm install -g expo-cli
-      npm install -g eas-cli
-    workingDirectory: "AwesomeProject/Frontend-IPA"
-    displayName: Install EAS build dependencies
+  # - bash: | 
+  #     set -x
+  #     npm install -g expo-cli
+  #     npm install -g eas-cli
+  #   workingDirectory: "AwesomeProject/Frontend-IPA"
+  #   displayName: Install EAS build dependencies
   - script: npx expo prebuild -p ios --clean
     workingDirectory: "AwesomeProject/Frontend-IPA"
     displayName: 'Prebuilding the project [generate xcode project]'
@@ -103,6 +103,9 @@ steps:
     displayName: 'Install CocoaPods'
     inputs:
       workingDirectory: 'AwesomeProject/Frontend-IPA/ios'
+  - bash: |
+      chmod -R +x $(System.DefaultWorkingDirectory)
+    displayName: 'Fix permission issues'
   - task: Xcode@5
     displayName: 'Build IPA'
     inputs:
