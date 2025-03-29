@@ -111,7 +111,7 @@ jobs:
       - task: Xcode@5
         displayName: 'Build IPA'
         inputs:
-          actions: 'clean build'
+          actions: 'clean archive'
           configuration: 'Release'
           sdk: 'iphoneos'
           xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject.xcworkspace'
