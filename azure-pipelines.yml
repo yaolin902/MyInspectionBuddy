@@ -126,7 +126,7 @@ jobs:
           exportTeamId: '$(TeamID)'
           exportOptions: 'specify'
           exportMethod: 'development'
-          args: '-verbose CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
+          args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
       - task: CopyFiles@2
         displayName: 'Copy IPA'
         inputs:
