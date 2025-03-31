@@ -116,17 +116,15 @@ jobs:
           sdk: 'iphoneos'
           xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject.xcworkspace'
           scheme: 'AwesomeProject'
+          xcodeVersion: '13'
           packageApp: true
           exportPath: 'output'
-          signingOption: manual
-          signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
-          provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
-          provisioningProfileName: '$(APPLE_PROV_PROFILE_NAME)'
+          # exportOptions: 'specify'
+          # exportMethod: 'development'
+          # exportTeamId: '$(TeamID)'
+          signingOption: 'auto'
           teamId: '$(TeamID)'
-          exportTeamId: '$(TeamID)'
-          exportOptions: 'specify'
-          exportMethod: 'development'
-          args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
+          # args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
       - task: CopyFiles@2
         displayName: 'Copy IPA'
         inputs:
