@@ -130,12 +130,12 @@ jobs:
           sdk: 'iphoneos'
           xcWorkspacePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject.xcworkspace'
           scheme: 'AwesomeProject'
-          packageApp: true
+          packageApp: false
           useXcpretty: false
           archivePath: '$(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive'
           signingOption: 'default'
           destinationPlatformOption: 'iOS'
-          args: '-verbose CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
+          args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No'
           # exportOptions: plist
           # exportOptionsPlist: '$(build.artifactStagingDirectory)/Archive/$(XCODE_EXPORT_OPTIONS_PLIST_FILE_NAME)'
           # exportPath: 'output'
@@ -145,8 +145,12 @@ jobs:
           # signingOption: 'auto'
           # teamId: '$(TeamID)'
           # args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
-      - bash: ls -R '$(build.artifactStagingDirectory)'
-        displayName: list archive
+      - task: Bash@3
+        displayName: 'Code signing'
+        inputs:
+          targetType: 'inline'
+          script:
+            codesign -f -s "$(APPLE_CERTIFICATE_SIGNING_IDENTITY)" $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive/Products/Applications/AwesomeProject.app
       - task: CopyFiles@2
         displayName: 'Copy IPA'
         inputs:
