@@ -133,7 +133,7 @@ jobs:
           packageApp: false
           useXcpretty: false
           signingOption: 'default'
-          archivePath: '$(build.artifactStagingDirectory)/Archive/$(scheme).xcarchive'
+          archivePath: '$(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive'
           destinationPlatformOption: 'iOS'
           args: '-verbose CODE_SIGNING_REQUIRED=Yes CODE_SIGNING_ALLOWED=No'
           # exportOptions: plist
@@ -145,19 +145,19 @@ jobs:
           # signingOption: 'auto'
           # teamId: '$(TeamID)'
           # args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
-      - script: ls -R '$(build.artifactStagingDirectory)/Archive/$(scheme).xcarchive'
+      - script: ls -R '$(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive'
         displayName: list archive
       - task: CopyFiles@2
         displayName: 'Copy IPA'
         inputs:
           contents: '**/*.ipa'
-          targetFolder: '$(build.artifactStagingDirectory)'
+          targetFolder: '$(build.artifactStagingDirectory)/App'
           overWrite: true
           flattenFolders: true
       # - task: PublishBuildArtifacts@1
       #   displayName: 'Publish IPA to artifacts'
       #   inputs:
-      #     PathtoPublish: '$(build.artifactStagingDirectory)'
+      #     PathtoPublish: '$(build.artifactStagingDirectory)/App'
       #     ArtifactName: 'ios'
       #     publishLocation: 'Container'
     #   - task: AppCenterDistribute@3
