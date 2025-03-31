@@ -145,6 +145,8 @@ jobs:
           # signingOption: 'auto'
           # teamId: '$(TeamID)'
           # args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
+      - script: ls -R '$(build.artifactStagingDirectory)/Archive/$(scheme).xcarchive'
+        displayName: list archive
       - task: CopyFiles@2
         displayName: 'Copy IPA'
         inputs:
