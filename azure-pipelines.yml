@@ -144,6 +144,20 @@ jobs:
           # signingOption: 'auto'
           # teamId: '$(TeamID)'
           # args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
+      - task: CmdLine@2
+        inputs:
+          script: |
+            echo "Structure of work folder of this pipeline:"
+            tree $(Agent.WorkFolder)/1
+
+            echo "Build.ArtifactStagingDirectory:" 
+            echo "$(Build.ArtifactStagingDirectory)"
+
+            echo "Build.BinariesDirectory:" 
+            echo "$(Build.BinariesDirectory)"
+
+            echo "Build.SourcesDirectory:"
+            echo "$(Build.SourcesDirectory)"
       - task: Bash@3
         displayName: 'Code signing'
         inputs:
