@@ -180,13 +180,13 @@ jobs:
       - task: AppStoreRelease@1
         inputs:
           authType: ApiKey
-          apiKeyId: 
-          apiKeyIssuerId: 
-          apitoken: 
+          apiKeyId: '$(APIKeyID)'
+          apiKeyIssuerId: '$(APIKeyIssuerID)'
+          apitoken: '$(APIToken)'
           releaseTrack: TestFlight
-          appIdentifier: 
+          appIdentifier: '$(AppBundleID)'
           appType: iOS
-          ipaPath: 
+          ipaPath: '$(build.artifactStagingDirectory)/Publish/*.ipa'
           shouldSkipWaitingForProcessing: true
           shouldSkipSubmission: true
-          appSpecificId: 
+          appSpecificId: '$(AppSpecificID)'
