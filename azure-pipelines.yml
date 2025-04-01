@@ -60,8 +60,6 @@ jobs:
         displayName: 'Install Node'
         inputs:
           versionSpec: '20.19.0'
-      - bash: |
-          brew install tree
       - script: yarn install
         workingDirectory: "AwesomeProject/Frontend-IPA"
         displayName: Install Dependencies
@@ -158,30 +156,37 @@ jobs:
           targetType: 'inline'
           script:
             /usr/bin/xcodebuild -exportArchive -archivePath $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive -exportPath $(Build.ArtifactStagingDirectory)/App -exportOptionsPlist $(build.artifactStagingDirectory)/Archive/exportOptions.plist
-      - bash: |
-          brew install tree
-          tree $(build.artifactStagingDirectory)/App
       - task: CopyFiles@2
         displayName: 'Copy IPA'
         inputs:
+          sourceFolder: '$(build.artifactStagingDirectory)/App'
           contents: '*.ipa'
-          targetFolder: '$(build.artifactStagingDirectory)/App'
+          targetFolder: '$(build.artifactStagingDirectory)/IPA'
           overWrite: true
           flattenFolders: true
-      # - task: PublishBuildArtifacts@1
-      #   displayName: 'Publish IPA to artifacts'
-      #   inputs:
-      #     PathtoPublish: '$(build.artifactStagingDirectory)/App'
-      #     ArtifactName: 'ios'
-      #     publishLocation: 'Container'
-    #   - task: AppCenterDistribute@3
-    #     displayName: 'Upload IPA to AppCenter'
-    #     inputs:
-    #       serverEndpoint: 'App Center'
-    #       appSlug: 'hnadeem/MyProject-iOS'
-    #       appFile: 'output/MyProject.ipa'
-    #       releaseNotesOption: 'file'
-    #       isMandatory: true
-    #       destinationType: 'groups'
-    #       distributionGroupId: '058a4704-ea24-4877-a2f0-bdfaff9335dc'
-    #       isSilent: true
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish IPA to artifacts'
+        inputs:
+          PathtoPublish: '$(build.artifactStagingDirectory)/IPA'
+          ArtifactName: 'ios'
+          publishLocation: 'Container'
+      - task: DownloadBuildArtifacts@1
+        displayName: 'Download artifacts'
+        inputs:
+          buildType: current
+          downloadType: specific
+          artifactName: 'ios'
+          downloadPath: '$(build.artifactStagingDirectory)/Publish'
+      - task: AppStoreRelease@1
+        inputs:
+          authType: ApiKey
+          apiKeyId: 
+          apiKeyIssuerId: 
+          apitoken: 
+          releaseTrack: TestFlight
+          appIdentifier: 
+          appType: iOS
+          ipaPath: 
+          shouldSkipWaitingForProcessing: true
+          shouldSkipSubmission: true
+          appSpecificId: 
