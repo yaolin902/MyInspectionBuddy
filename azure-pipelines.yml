@@ -60,6 +60,8 @@ jobs:
         displayName: 'Install Node'
         inputs:
           versionSpec: '20.19.0'
+      - bash: |
+          brew install tree
       - script: yarn install
         workingDirectory: "AwesomeProject/Frontend-IPA"
         displayName: Install Dependencies
@@ -114,7 +116,7 @@ jobs:
             mkdir '$(build.artifactStagingDirectory)/Archive' && cd "$_"
 
             /usr/libexec/PlistBuddy -c "Clear dict" exportOptions.plist
-            /usr/libexec/PlistBuddy -c "Add method string app-store" exportOptions.plist
+            /usr/libexec/PlistBuddy -c "Add method string app-store-connect" exportOptions.plist
             /usr/libexec/PlistBuddy -c "Add signingStyle string manual" exportOptions.plist
             /usr/libexec/PlistBuddy -c "Add signingCertificate string Apple Distribution" exportOptions.plist
             /usr/libexec/PlistBuddy -c "Add provisioningProfiles dict" exportOptions.plist
@@ -156,10 +158,13 @@ jobs:
           targetType: 'inline'
           script:
             /usr/bin/xcodebuild -exportArchive -archivePath $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive -exportPath $(Build.ArtifactStagingDirectory)/App -exportOptionsPlist $(build.artifactStagingDirectory)/Archive/exportOptions.plist
+      - bash: |
+          brew install tree
+          tree $(build.artifactStagingDirectory)/App
       - task: CopyFiles@2
         displayName: 'Copy IPA'
         inputs:
-          contents: '**/*.ipa'
+          contents: '*.ipa'
           targetFolder: '$(build.artifactStagingDirectory)/App'
           overWrite: true
           flattenFolders: true
