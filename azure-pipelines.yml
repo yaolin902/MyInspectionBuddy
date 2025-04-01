@@ -132,10 +132,9 @@ jobs:
           scheme: 'AwesomeProject'
           packageApp: false
           useXcpretty: false
-          archivePath: '$(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive'
           signingOption: 'default'
           destinationPlatformOption: 'iOS'
-          args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No'
+          args: '-verbose -archivePath $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive CODE_SIGNING_REQUIRED=Yes CODE_SIGNING_ALLOWED=No'
           # exportOptions: plist
           # exportOptionsPlist: '$(build.artifactStagingDirectory)/Archive/$(XCODE_EXPORT_OPTIONS_PLIST_FILE_NAME)'
           # exportPath: 'output'
