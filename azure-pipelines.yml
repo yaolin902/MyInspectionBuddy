@@ -164,6 +164,12 @@ jobs:
           targetType: 'inline'
           script:
             codesign -f -s "$(APPLE_CERTIFICATE_SIGNING_IDENTITY)" $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive/Products/Applications/AwesomeProject.app
+      - task: Bash@3
+        displayName: 'Xcode export'
+        inputs:
+          targetType: 'inline'
+          script:
+            /usr/bin/xcodebuild -exportArchive -archivePath $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive -exportPath $(Build.ArtifactStagingDirectory)/App
       - task: CopyFiles@2
         displayName: 'Copy IPA'
         inputs:
