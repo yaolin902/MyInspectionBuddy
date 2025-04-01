@@ -155,7 +155,7 @@ jobs:
         inputs:
           targetType: 'inline'
           script:
-            /usr/bin/xcodebuild -exportArchive -archivePath $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive -exportPath $(Build.ArtifactStagingDirectory)/App
+            /usr/bin/xcodebuild -exportArchive -archivePath $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive -exportPath $(Build.ArtifactStagingDirectory)/App -exportOptionsPlist $(build.artifactStagingDirectory)/Archive/exportOptions.plist
       - task: CopyFiles@2
         displayName: 'Copy IPA'
         inputs:
