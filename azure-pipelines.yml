@@ -178,6 +178,7 @@ jobs:
           artifactName: 'ios'
           downloadPath: '$(build.artifactStagingDirectory)/Publish'
       - task: AppStoreRelease@1
+        displayName: 'Publish IPA to TestFlight'
         inputs:
           authType: ApiKey
           apiKeyId: '$(APIKeyID)'
@@ -186,7 +187,7 @@ jobs:
           releaseTrack: TestFlight
           appIdentifier: '$(AppBundleID)'
           appType: iOS
-          ipaPath: '$(build.artifactStagingDirectory)/Publish/*.ipa'
+          ipaPath: '$(build.artifactStagingDirectory)/App/*.ipa'
           shouldSkipWaitingForProcessing: true
           shouldSkipSubmission: true
           appSpecificId: '$(AppSpecificID)'
