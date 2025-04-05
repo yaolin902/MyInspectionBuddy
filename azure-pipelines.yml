@@ -41,6 +41,7 @@ jobs:
         workingDirectory: "AwesomeProject/Frontend-IPA"
         displayName: Install Dependencies
       - script: |
+          echo "$(Build.SourceBranchName)"
           # Disable autocommit on version bump
           yarn config set version-sign-git-tag false
           yarn config set version-git-tag false
