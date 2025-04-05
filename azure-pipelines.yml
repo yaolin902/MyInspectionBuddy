@@ -1,22 +1,6 @@
-# # Starter pipeline
-# # Start with a minimal pipeline that you can customize to build and deploy your code.
-# # Add steps that build, run tests, deploy, and more:
-# # https://aka.ms/yaml
+# Expo to IPA pipeline
+# Install all dependency, convert expo project to xcode, build .ipa from xcode and upload to app store connect
 
-# trigger:
-# - main
-
-# pool:
-#   vmImage: ubuntu-latest
-
-# steps:
-# - script: echo Hello, world!
-#   displayName: 'Run a one-line script'
-
-# - script: |
-#     echo Add other tasks to build, test, and deploy your project.
-#     echo See https://aka.ms/yaml
-#   displayName: 'Run a multi-line script'
 trigger:
   branches:
     include:
@@ -40,13 +24,6 @@ jobs:
         displayName: Install Apple Certificate
         inputs:
           certSecureFile: 'distributionCertificates.p12'
-          certPwd: '$(AppleP12Password)'
-          keychain: 'temp'
-          deleteCert: true
-      - task: InstallAppleCertificate@2
-        displayName: Install Apple Certificate 2
-        inputs:
-          certSecureFile: 'developmentCertificates.p12'
           certPwd: '$(AppleP12Password)'
           keychain: 'temp'
           deleteCert: true
@@ -81,13 +58,13 @@ jobs:
           # Set environment variables
           echo "##vso[task.setvariable variable=OLD_VERSION]$oldVer"
           echo "##vso[task.setvariable variable=NEW_VERSION]$newVer"
-        displayName: 'Bump version and set variables'
+        displayName: 'Bump Version'
         workingDirectory: "AwesomeProject/Frontend-IPA"
       - script: npx expo prebuild -p ios --clean
         workingDirectory: "AwesomeProject/Frontend-IPA"
-        displayName: 'Expo prebuild project to xcode project'
+        displayName: 'Expo Prebuilt to Xcode'
       - task: ios-bundle-version@1
-        displayName: 'Bump iOS version'
+        displayName: 'Bump iOS Version'
         inputs:
           sourcePath: 'AwesomeProject/Frontend-IPA/ios/AwesomeProject/Info.plist'
           versionCodeOption: 'buildid'
@@ -103,7 +80,7 @@ jobs:
           git pull --rebase origin $(Build.SourceBranchName)
           git push origin $(Build.SourceBranchName)
           git push --tags
-        displayName: Bump commit
+        displayName: Commit Bumped Version
       - task: CocoaPods@0
         displayName: 'Install CocoaPods'
         inputs:
@@ -121,9 +98,9 @@ jobs:
             /usr/libexec/PlistBuddy -c "Add provisioningProfiles:$(AppBundleID) string $(APPLE_PROV_PROFILE_UUID)" exportOptions.plist
             /usr/libexec/PlistBuddy -c "Add teamID string $(TeamID)" exportOptions.plist
             /usr/libexec/PlistBuddy -x -c "Print" exportOptions.plist
-        displayName: 'Generate export options'
+        displayName: 'Generate Export Options'
       - task: Xcode@5
-        displayName: 'Build IPA'
+        displayName: 'Xcode Archive'
         inputs:
           actions: 'clean archive'
           configuration: 'Release'
@@ -135,23 +112,14 @@ jobs:
           signingOption: 'default'
           destinationPlatformOption: 'iOS'
           args: '-verbose -archivePath $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive CODE_SIGNING_REQUIRED=Yes CODE_SIGNING_ALLOWED=No'
-          # exportOptions: plist
-          # exportOptionsPlist: '$(build.artifactStagingDirectory)/Archive/exportOptions.plist'
-          # exportPath: 'output'
-          # exportOptions: 'specify'
-          # exportMethod: 'development'
-          # exportTeamId: '$(TeamID)'
-          # signingOption: 'auto'
-          # teamId: '$(TeamID)'
-          # args: '-verbose -allowProvisioningUpdates CODE_SIGNING_ALLOWED=No CODE_SIGNING_REQUIRED=Yes CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$(TeamID)"'
       - task: Bash@3
-        displayName: 'Code signing'
+        displayName: 'Code Signing'
         inputs:
           targetType: 'inline'
           script:
             codesign -f -s "$(APPLE_CERTIFICATE_SIGNING_IDENTITY)" $(build.artifactStagingDirectory)/Archive/AwesomeProject.xcarchive/Products/Applications/AwesomeProject.app
       - task: Bash@3
-        displayName: 'Xcode export'
+        displayName: 'Xcode Export to IPA'
         inputs:
           targetType: 'inline'
           script:
@@ -165,13 +133,13 @@ jobs:
           overWrite: true
           flattenFolders: true
       - task: PublishBuildArtifacts@1
-        displayName: 'Publish IPA to artifacts'
+        displayName: 'Publish IPA to Artifacts'
         inputs:
           PathtoPublish: '$(build.artifactStagingDirectory)/IPA'
           ArtifactName: 'ios'
           publishLocation: 'Container'
       - task: DownloadBuildArtifacts@1
-        displayName: 'Download artifacts'
+        displayName: 'Download Artifacts'
         inputs:
           buildType: current
           downloadType: specific
