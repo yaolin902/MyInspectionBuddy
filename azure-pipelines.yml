@@ -1,10 +1,8 @@
 # Expo to IPA pipeline
 # Install all dependency, convert expo project to xcode, build .ipa from xcode and upload to app store connect
 
-trigger:
-  branches:
-    include:
-      - main
+pr:
+  - main
 
 variables:
   - group: Mobile
