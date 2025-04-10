@@ -47,6 +47,7 @@ jobs:
           yarn config set version-commit-hooks false
           # Checkout branch where the build is triggered
           git fetch origin
+          git checkout -b main origin/main
           # Extract existing version of package.json
           oldVer=$(jq -r ".version" package.json)
           # Bump version
