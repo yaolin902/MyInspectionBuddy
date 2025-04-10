@@ -47,7 +47,6 @@ jobs:
           yarn config set version-commit-hooks false
           # Checkout branch where the build is triggered
           git fetch origin
-          git checkout -b azure-pipelines origin/azure-pipelines
           # Extract existing version of package.json
           oldVer=$(jq -r ".version" package.json)
           # Bump version
@@ -78,8 +77,8 @@ jobs:
           git add *
           git commit -m "Update version from $(OLD_VERSION) to $(NEW_VERSION) [skip ci]"
           git tag $tag
-          git pull --rebase origin azure-pipelines
-          git push origin azure-pipelines
+          git pull --rebase origin main
+          git push origin main
           git push --tags
         displayName: Commit Bumped Version
       - task: CocoaPods@0
