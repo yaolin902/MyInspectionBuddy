@@ -1,8 +1,10 @@
 # Expo to IPA pipeline
 # Install all dependency, convert expo project to xcode, build .ipa from xcode and upload to app store connect
 
-pr:
-  - main
+trigger:
+  branches:
+    include:
+    - main
 
 variables:
   - group: Mobile
@@ -74,7 +76,7 @@ jobs:
           tag="ios_$(NEW_VERSION)"
           echo "New tag $tag"
           git add *
-          git commit -m "Update version from $(OLD_VERSION) to $(NEW_VERSION)"
+          git commit -m "Update version from $(OLD_VERSION) to $(NEW_VERSION) [skip ci]"
           git tag $tag
           git pull --rebase origin azure-pipelines
           git push origin azure-pipelines
