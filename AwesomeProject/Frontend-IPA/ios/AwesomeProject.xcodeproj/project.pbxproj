@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		081E209BEAA2C5687130544A /* Pods_AwesomeProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 575C18315A98E3EDD86C7A9D /* Pods_AwesomeProject.framework */; };
-		087EE0C4F67E429CA17E9D82 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 83725C4E6A9D7D5DC325FFD1 /* PrivacyInfo.xcprivacy */; };
+		02DCD344548DA58924693B0F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6D9C8B03007CC6E2094F2C19 /* PrivacyInfo.xcprivacy */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		14C16F719806A89EF6164FCE /* Pods_AwesomeProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E9A60CC18BE149107EB188B /* Pods_AwesomeProject.framework */; };
+		30B6CA0BD6274F6C8BE56BC0 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8799915EED3D4B098BAA42A9 /* noop-file.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		80E6B2F5E5684AFC9460F238 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2ECAEA402FB84786AACFF58A /* GoogleService-Info.plist */; };
-		9A85E1C43A854A179475673B /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B836DE525B42C681836AD3 /* noop-file.swift */; };
+		7C2CEA2CCD4D4ED08B988FEC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B7EE361FB92444C1B3F0D183 /* GoogleService-Info.plist */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 /* End PBXBuildFile section */
@@ -26,15 +26,15 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = AwesomeProject/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = AwesomeProject/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = AwesomeProject/main.m; sourceTree = "<group>"; };
-		2ECAEA402FB84786AACFF58A /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "AwesomeProject/GoogleService-Info.plist"; sourceTree = "<group>"; };
-		575C18315A98E3EDD86C7A9D /* Pods_AwesomeProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AwesomeProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		174C9BFE060E4A58AAFC087F /* AwesomeProject-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "AwesomeProject-Bridging-Header.h"; path = "AwesomeProject/AwesomeProject-Bridging-Header.h"; sourceTree = "<group>"; };
+		1E9A60CC18BE149107EB188B /* Pods_AwesomeProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AwesomeProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C2E3173556A471DD304B334 /* Pods-AwesomeProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AwesomeProject.debug.xcconfig"; path = "Target Support Files/Pods-AwesomeProject/Pods-AwesomeProject.debug.xcconfig"; sourceTree = "<group>"; };
+		6D9C8B03007CC6E2094F2C19 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = AwesomeProject/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		7A4D352CD337FB3A3BF06240 /* Pods-AwesomeProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AwesomeProject.release.xcconfig"; path = "Target Support Files/Pods-AwesomeProject/Pods-AwesomeProject.release.xcconfig"; sourceTree = "<group>"; };
-		83725C4E6A9D7D5DC325FFD1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = AwesomeProject/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		90B836DE525B42C681836AD3 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "AwesomeProject/noop-file.swift"; sourceTree = "<group>"; };
+		8799915EED3D4B098BAA42A9 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "AwesomeProject/noop-file.swift"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = AwesomeProject/SplashScreen.storyboard; sourceTree = "<group>"; };
+		B7EE361FB92444C1B3F0D183 /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "AwesomeProject/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		E2E42452F8E54E94AFEA3BF4 /* AwesomeProject-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "AwesomeProject-Bridging-Header.h"; path = "AwesomeProject/AwesomeProject-Bridging-Header.h"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-AwesomeProject/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -44,7 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				081E209BEAA2C5687130544A /* Pods_AwesomeProject.framework in Frameworks */,
+				14C16F719806A89EF6164FCE /* Pods_AwesomeProject.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,10 +61,10 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				2ECAEA402FB84786AACFF58A /* GoogleService-Info.plist */,
-				90B836DE525B42C681836AD3 /* noop-file.swift */,
-				E2E42452F8E54E94AFEA3BF4 /* AwesomeProject-Bridging-Header.h */,
-				83725C4E6A9D7D5DC325FFD1 /* PrivacyInfo.xcprivacy */,
+				B7EE361FB92444C1B3F0D183 /* GoogleService-Info.plist */,
+				8799915EED3D4B098BAA42A9 /* noop-file.swift */,
+				174C9BFE060E4A58AAFC087F /* AwesomeProject-Bridging-Header.h */,
+				6D9C8B03007CC6E2094F2C19 /* PrivacyInfo.xcprivacy */,
 			);
 			name = AwesomeProject;
 			sourceTree = "<group>";
@@ -73,7 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				575C18315A98E3EDD86C7A9D /* Pods_AwesomeProject.framework */,
+				1E9A60CC18BE149107EB188B /* Pods_AwesomeProject.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -150,14 +150,14 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "AwesomeProject" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				74777712D1F0E0444E2701F1 /* [Expo] Configure project */,
+				23419FDF9B1DFAA9A0641034 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				73F0088C970514FBABA0AD0A /* [CP] Embed Pods Frameworks */,
-				B0D0F1D522544FB48C2E0E67 /* [CP-User] [RNFB] Core Configuration */,
+				C862FFA85B2D7C6A3D90F76D /* [CP] Embed Pods Frameworks */,
+				F05483C3E743A741A52D65D5 /* [CP-User] [RNFB] Core Configuration */,
 			);
 			buildRules = (
 			);
@@ -207,8 +207,8 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				80E6B2F5E5684AFC9460F238 /* GoogleService-Info.plist in Resources */,
-				087EE0C4F67E429CA17E9D82 /* PrivacyInfo.xcprivacy in Resources */,
+				7C2CEA2CCD4D4ED08B988FEC /* GoogleService-Info.plist in Resources */,
+				02DCD344548DA58924693B0F /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,25 +252,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		73F0088C970514FBABA0AD0A /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AwesomeProject/Pods-AwesomeProject-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AwesomeProject/Pods-AwesomeProject-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		74777712D1F0E0444E2701F1 /* [Expo] Configure project */ = {
+		23419FDF9B1DFAA9A0641034 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -339,7 +321,25 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AwesomeProject/Pods-AwesomeProject-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B0D0F1D522544FB48C2E0E67 /* [CP-User] [RNFB] Core Configuration */ = {
+		C862FFA85B2D7C6A3D90F76D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AwesomeProject/Pods-AwesomeProject-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AwesomeProject/Pods-AwesomeProject-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F05483C3E743A741A52D65D5 /* [CP-User] [RNFB] Core Configuration */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -362,7 +362,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				9A85E1C43A854A179475673B /* noop-file.swift in Sources */,
+				30B6CA0BD6274F6C8BE56BC0 /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
